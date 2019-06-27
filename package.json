@@ -1,0 +1,38 @@
+{
+  "name": "@totvs/tds-languageclient",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./target/index.js",
+  "scripts": {
+    "build": "tsc -p .",
+    "watch": "tsc -w -p .",
+    "clean": "rimraf ./target",
+    "lint": "eslint ./src/**",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/totvs/tds-languageclient.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/totvs/tds-languageclient/issues"
+  },
+  "homepage": "https://github.com/totvs/tds-languageclient#readme",
+  "dependencies": {
+    "@totvs/tds-ls": "^1.0.30",
+    "vscode-jsonrpc": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.0.10",
+    "@typescript-eslint/eslint-plugin": "^1.11.0",
+    "@typescript-eslint/parser": "^1.11.0",
+    "eslint": "^6.0.1",
+    "rimraf": "^2.6.3",
+    "typescript": "^3.5.2"
+  },
+  "eslintIgnore": [
+    "target/**"
+  ]
+}
