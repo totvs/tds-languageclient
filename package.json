@@ -1,7 +1,7 @@
 {
   "name": "@totvs/tds-languageclient",
   "version": "0.0.2",
-  "description": "",
+  "description": "TOTVS Language Client",
   "main": "./target/index.js",
   "types": "./target/index.d.ts",
   "files": ["./target/**/*"],
@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/totvs/tds-languageclient.git"
   },
-  "author": "",
+  "author": "TOTVS S.A.",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/totvs/tds-languageclient/issues"
@@ -36,5 +36,8 @@
   },
   "eslintIgnore": [
     "target/**"
+  ],
+  "keywords": [
+    "tds"
   ]
 }
