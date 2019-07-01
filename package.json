@@ -4,12 +4,16 @@
   "description": "TOTVS Language Client",
   "main": "./target/index.js",
   "types": "./target/index.d.ts",
-  "files": ["./target/**/*"],
+  "files": [
+    "package.json",
+    "target"
+  ],
   "scripts": {
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./target",
     "lint": "eslint ./src/**",
+    "prepublish": "npm run clean && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
