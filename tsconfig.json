@@ -15,7 +15,8 @@
         "allowSyntheticDefaultImports": true,
 
         "removeComments": true,
-
+        "declaration": true,
+        "declarationDir": "./target",
 
         "lib": [
             "es2015"

@@ -32,6 +32,7 @@
     "rimraf": "^2.6.3",
     "typescript": "^3.5.2"
   },
+  "types": "./target/index.d.ts",
   "eslintIgnore": [
     "target/**"
   ]
