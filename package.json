@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "description": "",
   "main": "./target/index.js",
+  "types": "./target/index.d.ts",
+  "files": ["./target/**/*"],
   "scripts": {
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
@@ -32,7 +34,6 @@
     "rimraf": "^2.6.3",
     "typescript": "^3.5.2"
   },
-  "types": "./target/index.d.ts",
   "eslintIgnore": [
     "target/**"
   ]
