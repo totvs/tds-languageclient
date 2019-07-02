@@ -1,6 +1,5 @@
 import { MessageConnection } from "vscode-jsonrpc";
-
-
+import { AuthenticationOptions, AuthenticationResult } from './TdsLanguageClient';
 
 export default class TdsServer {
 

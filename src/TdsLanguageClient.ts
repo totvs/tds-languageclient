@@ -68,3 +68,19 @@ export default class TdsLanguageClient {
 
 
 }
+
+export interface AuthenticationOptions {
+    connType: number;
+    identification: string;
+    server: string;
+    port: number;
+    buildVersion: BuildVersion;
+    environment: string;
+    user: string;
+    password: string;
+    autoReconnect: boolean;
+}
+
+export interface AuthenticationResult {
+    connectionToken: string;
+}

@@ -3,7 +3,6 @@
         "target": "es5",
         "module": "commonjs",
         "moduleResolution": "node",
-
         "esModuleInterop": true,
         "alwaysStrict": true,
         "downlevelIteration": true,
@@ -13,7 +12,6 @@
         "noImplicitThis": true,
         "noFallthroughCasesInSwitch": true,
         "allowSyntheticDefaultImports": true,
-
         "removeComments": true,
         "declaration": true,
         "declarationDir": "./target",
