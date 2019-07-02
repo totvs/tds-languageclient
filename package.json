@@ -5,7 +5,6 @@
   "main": "./target/index.js",
   "types": "./target/index.d.ts",
   "files": [
-    "package.json",
     "target"
   ],
   "scripts": {
