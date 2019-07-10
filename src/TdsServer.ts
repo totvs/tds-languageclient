@@ -1,10 +1,12 @@
 import { MessageConnection } from "vscode-jsonrpc";
-import { AuthenticationOptions, AuthenticationResult } from './TdsLanguageClient';
+import { AuthenticationOptions, ReconnectOptions, ServerAuthenticationResult } from './TdsLanguageClient';
+
+
 
 export default class TdsServer {
 
     public token: string = null;
-    
+
     protected connection: MessageConnection = null;
 
     public constructor(connection: MessageConnection) {
@@ -17,7 +19,7 @@ export default class TdsServer {
                 authenticationInfo: options
             })
             .then(
-                (result: AuthenticationResult) => {
+                (result: ServerAuthenticationResult) => {
                     this.token = result.connectionToken;
 
                     return true;
@@ -27,4 +29,23 @@ export default class TdsServer {
                 }));
     }
 
+    public async reconnect(options: ReconnectOptions): Promise<boolean> {
+        return this.connection
+            .sendRequest('$totvsserver/reconnect', {
+                reconnectInfo: {
+                    connectionToken: options.token,
+                    serverName: options.servername
+                }
+            }).then((result: ServerReconnectResult) => {
+
+                return true;
+            })
+    }
+}
+
+
+interface ServerReconnectResult {
+    connectionToken: string;
+	environment: string;
+	user: string;
 }

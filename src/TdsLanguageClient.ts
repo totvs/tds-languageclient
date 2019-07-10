@@ -1,18 +1,38 @@
 import createTdsMessageConnection from './createTdsMessageConnection';
-import { MessageConnection } from 'vscode-jsonrpc';
+import { MessageConnection, NotificationMessage } from 'vscode-jsonrpc';
 import TdsServer from './TdsServer';
 import TdsMonitorServer from './TdsMonitorServer';
+import { EventEmitter } from 'events';
 
 let instance: TdsLanguageClient = null;
 
-export default class TdsLanguageClient {
+export default class TdsLanguageClient extends EventEmitter {
 
     private connection: MessageConnection = null;
     private servers: Map<string, TdsServer> = null;
 
     private constructor() {
+        super();
+
         this.connection = createTdsMessageConnection();
         this.servers = new Map();
+
+        //this.connection.onUnhandledNotification(e: NotificationMessage) =>  console.log(e));
+
+        this.connection.onUnhandledNotification(function(e: NotificationMessage) {
+            console.log(...arguments);
+        });
+
+
+        this.connection.onNotification('', (...params) => this.emit('event', ...params))
+    }
+
+    public on(event: string, listener: (...args: any[]) => void): this {
+        super.on(event, listener);
+
+        this.connection.onNotification(event, (...params) => this.emit('event', ...params))
+
+        return this;
     }
 
     public static instance(): TdsLanguageClient {
@@ -49,25 +69,17 @@ export default class TdsLanguageClient {
     }
 
     public async authenticate(options: AuthenticationOptions): Promise<string> {
-        return this.connection.sendRequest('$totvsserver/authentication', {
-            authenticationInfo: options
-        })
-            .then((result: AuthenticationResult) => result.connectionToken);
+        return this.connection
+            .sendRequest('$totvsserver/authentication', {
+                authenticationInfo: options
+            })
+            .then((result: ServerAuthenticationResult) => result.connectionToken);
     }
-
-    /*
-    public async getMonitorUsers(options: GetMonitorUsersOptions): Promise<MonitorUser[]> {
-        return this.connection.sendRequest('$totvsmonitor/getUsers', {
-            getUsersInfo: {
-                connectionToken: options.token
-            }
-        });
-    }
-    */
-
-
 
 }
+
+
+
 
 export interface AuthenticationOptions {
     connType: number;
@@ -81,6 +93,25 @@ export interface AuthenticationOptions {
     autoReconnect: boolean;
 }
 
-export interface AuthenticationResult {
+export interface ServerAuthenticationResult {
+    id: any;
+    osType: number;
     connectionToken: string;
+}
+
+export interface AuthenticationResult {
+    token: string;
+}
+
+export interface ReconnectOptions {
+    token: string;
+    servername: string;
+}
+
+export interface ReconnectResult {
+    token: string;
+    environment: string;
+    username: string;
+
+
 }
