@@ -68,6 +68,14 @@ export default class TdsLanguageClient extends EventEmitter {
         }
     }
 
+    public async validation(options: ValidationOptions): Promise<string> {
+        return this.connection
+            .sendRequest('$totvsserver/validation', {
+                validationInfo: options
+            })
+            .then((result: ServerValidationResult) => result.buildVersion);
+    }
+
     public async authenticate(options: AuthenticationOptions): Promise<string> {
         return this.connection
             .sendRequest('$totvsserver/authentication', {
@@ -79,7 +87,14 @@ export default class TdsLanguageClient extends EventEmitter {
 }
 
 
+export interface ValidationOptions {
+    server: string;
+    port: number;
+}
 
+export interface ServerValidationResult {
+    buildVersion: BuildVersion;
+}
 
 export interface AuthenticationOptions {
     connType: number;
