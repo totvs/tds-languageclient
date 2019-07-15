@@ -2,6 +2,16 @@ import TdsServer from "./TdsServer";
 
 export default class TdsMonitorServer extends TdsServer {
 
+    public async disconnect() {
+        this.connection
+            .sendRequest('$totvsmonitor/disconnect', {
+                disconnectInfo: {
+                    connectionToken: this.token
+                }
+            })
+            .then((response: any) => response.message);
+    }
+
     public async getUsers(): Promise<MonitorUser[]> {
         return this.connection
             .sendRequest('$totvsmonitor/getUsers', {
