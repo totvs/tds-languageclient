@@ -3,6 +3,7 @@ import { MessageConnection, NotificationMessage } from 'vscode-jsonrpc';
 import TdsServer from './TdsServer';
 import TdsMonitorServer from './TdsMonitorServer';
 import { EventEmitter } from 'events';
+import { BuildVersion } from './types';
 
 let instance: TdsLanguageClient = null;
 
@@ -43,6 +44,10 @@ export default class TdsLanguageClient extends EventEmitter {
         return instance;
     }
 
+    public createMonitorServer(): TdsMonitorServer {
+        return new TdsMonitorServer(this.connection);
+    }
+
     public async getMonitorServer(token: string): Promise<TdsMonitorServer>;
     public async getMonitorServer(options: AuthenticationOptions): Promise<TdsMonitorServer>
     public async getMonitorServer(arg: any): Promise<TdsMonitorServer> {
@@ -59,7 +64,7 @@ export default class TdsLanguageClient extends EventEmitter {
         else {
             const server = new ServerClass(this.connection);
 
-            let connected = await server.connect(arg as AuthenticationOptions);
+            let connected = await server.authenticate(arg as AuthenticationOptions);
 
             if (connected)
                 return server;
