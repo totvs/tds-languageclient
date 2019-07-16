@@ -22,7 +22,6 @@ export default class TdsServer {
         }
     }
 
-
     public async authenticate(options: AuthenticationOptions): Promise<boolean> {
         return this.connection
             .sendRequest('$totvsserver/authentication', {
@@ -67,6 +66,17 @@ export default class TdsServer {
                 }));
     }
 
+    public async disconnect() {
+        this.connection
+            .sendRequest('$totvsserver/disconnect', {
+                disconnectInfo: {
+                    connectionToken: this.token,
+                    serverName: this.id
+                }
+            })
+            .then((response: any) => response.message);
+    }
+
     public async reconnect(options: ReconnectOptions): Promise<boolean> {
         return this.connection
             .sendRequest('$totvsserver/reconnect', {
@@ -109,7 +119,6 @@ export interface ConnectOptions {
     username: string;
     password: string;
 }
-
 
 interface ServerValidationResult {
     id: string;
