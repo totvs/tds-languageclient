@@ -78,14 +78,17 @@ export default class TdsServer {
     }
 
     public async reconnect(options: ReconnectOptions): Promise<boolean> {
+        if ((options) && (options.token)) {
+            this.token = options.token;
+        }
+
         return this.connection
             .sendRequest('$totvsserver/reconnect', {
                 reconnectInfo: {
-                    connectionToken: options.token,
+                    connectionToken: this.token,
                     serverName: this.id
                 }
             }).then((result: ServerReconnectResult) => {
-
                 return true;
             })
     }
