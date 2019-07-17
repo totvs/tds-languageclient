@@ -77,7 +77,7 @@ export default class TdsServer {
             .then((response: any) => response.message);
     }
 
-    public async reconnect(options: ReconnectOptions): Promise<boolean> {
+    public async reconnect(options?: ReconnectOptions): Promise<boolean> {
         if ((options) && (options.token)) {
             this.token = options.token;
         }

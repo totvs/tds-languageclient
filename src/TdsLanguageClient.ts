@@ -49,7 +49,7 @@ export default class TdsLanguageClient extends EventEmitter {
     }
 
     public async getMonitorServer(token: string): Promise<TdsMonitorServer>;
-    public async getMonitorServer(options: AuthenticationOptions): Promise<TdsMonitorServer>
+    public async getMonitorServer(options: AuthenticationOptions): Promise<TdsMonitorServer>;
     public async getMonitorServer(arg: any): Promise<TdsMonitorServer> {
         return this.getServer(TdsMonitorServer, arg);
     };
