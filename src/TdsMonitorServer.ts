@@ -15,7 +15,7 @@ export default class TdsMonitorServer extends TdsServer {
     public async appKillUser(userName: string, computerName: string, threadId: number, serverName: string) {
         this.connection
             .sendRequest('$totvsmonitor/appKillUser', {
-                killUsappKillUserInfoerInfo: {
+                appKillUserInfo: {
                     connectionToken: this.token,
                     userName: userName,
                     computerName: computerName,
