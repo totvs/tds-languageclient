@@ -115,6 +115,16 @@ export default class TdsServer {
                     return false
                 }));
     }
+
+    public async stopServer() {
+        this.connection
+            .sendRequest('$totvsserver/stopServer', {
+                stopServerInfo: {
+                    connectionToken: this.token
+                }
+            })
+            .then((response: any) => response.message);
+    }
 }
 
 export interface ConnectOptions {
