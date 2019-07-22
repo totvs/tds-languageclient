@@ -54,6 +54,27 @@ export default class TdsMonitorServer extends TdsServer {
             })
             .then((response: any) => response.message);
     }
+
+    public async getConnectionStatus(): Promise<boolean> {
+        return this.connection
+            .sendRequest('$totvsmonitor/getConnectionStatus', {
+                getConnectionStatusInfo: {
+                    connectionToken: this.token
+                }
+            })
+            .then((response: any) => response.status);
+    }
+
+    public async setConnectionStatus(status: boolean) {
+        this.connection
+            .sendRequest('$totvsmonitor/setConnectionStatus', {
+                setConnectionStatusInfo: {
+                    connectionToken: this.token,
+                    status: status
+                }
+            })
+            .then((response: any) => response.message);
+    }
 }
 
 export interface MonitorUser {
