@@ -6,17 +6,22 @@ export default function createTdsMessageConnection(args?: string[], options?: an
     let spawnArgs = ['--language-server'],
         spawnOptions = {
             env: process.env
-        };
+        },
+        bin = languageServerBin;
 
     if (Array.isArray(args)) {
         spawnArgs.push(...args);
     }
 
     if (options) {
-        Object.assign(spawnOptions, options); 
+        Object.assign(spawnOptions, options);
     }
 
-    let childProcess = spawn(languageServerBin, spawnArgs, spawnOptions);
+    if (bin.match(/[\\\/]app\.asar[\\\/]/)) {
+        bin = bin.replace(/([\\\/]app\.asar)([\\\/])/g, '$1.unpacked$2');
+    }
+
+    let childProcess = spawn(bin, spawnArgs, spawnOptions);
 
     // Use stdin and stdout for communication:
     let connection = createMessageConnection(
