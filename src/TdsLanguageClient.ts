@@ -20,21 +20,24 @@ export default class TdsLanguageClient extends EventEmitter {
 
         //this.connection.onUnhandledNotification(e: NotificationMessage) =>  console.log(e));
 
-        this.connection.onUnhandledNotification(function(e: NotificationMessage) {
-            console.log(...arguments);
+        this.connection.onUnhandledNotification((e: NotificationMessage) => {
+            this.emit(e.method, e.params);
+            //console.log(...arguments);
         });
 
 
-        this.connection.onNotification('', (...params) => this.emit('event', ...params))
+        //this.connection.onNotification('', (...params) => this.emit('event', ...params))
     }
 
+    /*
     public on(event: string, listener: (...args: any[]) => void): this {
         super.on(event, listener);
 
-        this.connection.onNotification(event, (...params) => this.emit('event', ...params))
+        this.connection.onNotification(event, (...params) => this.emit(event, ...params))
 
         return this;
     }
+    */
 
     public static instance(): TdsLanguageClient {
         if (instance === null) {
