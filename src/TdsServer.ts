@@ -90,7 +90,10 @@ export default class TdsServer {
                 }
             }).then((result: ServerReconnectResult) => {
                 return true;
-            })
+            },
+            ((error: Error) => {
+                return false
+            }));
     }
 
     public async validate(): Promise<boolean> {

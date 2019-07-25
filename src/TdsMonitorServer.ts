@@ -9,7 +9,11 @@ export default class TdsMonitorServer extends TdsServer {
                     connectionToken: this.token
                 }
             })
-            .then((response: any) => response.mntUsers);
+            .then((response: any) => response.mntUsers,
+                ((error: Error) => {
+                    return null
+                })
+            );
     }
 
     public async appKillUser(userName: string, computerName: string, threadId: number, serverName: string) {
