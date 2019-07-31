@@ -1,6 +1,7 @@
 import { spawn } from 'child_process';
 import { MessageConnection, StreamMessageReader, StreamMessageWriter, createMessageConnection } from 'vscode-jsonrpc';
 import languageServerBin from '@totvs/tds-ls';
+import { chmodSync } from 'fs';
 
 export default function createTdsMessageConnection(args?: string[], options?: any): MessageConnection {
     let spawnArgs = ['--language-server'],
@@ -19,6 +20,10 @@ export default function createTdsMessageConnection(args?: string[], options?: an
 
     if (bin.match(/[\\\/]app\.asar[\\\/]/)) {
         bin = bin.replace(/([\\\/]app\.asar)([\\\/])/g, '$1.unpacked$2');
+    }
+
+    if (process.platform !== 'win32') {
+        chmodSync(bin, '0777');
     }
 
     let childProcess = spawn(bin, spawnArgs, spawnOptions);
