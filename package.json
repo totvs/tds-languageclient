@@ -26,11 +26,11 @@
   },
   "homepage": "https://github.com/totvs/tds-languageclient#readme",
   "dependencies": {
-    "@totvs/tds-ls": "^1.0.35",
+    "@totvs/tds-ls": "^1.0.36",
     "vscode-jsonrpc": "^4.0.0"
   },
   "devDependencies": {
-    "@types/node": "^12.6.9",
+    "@types/node": "^12.7.1",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
     "eslint": "^6.1.0",
