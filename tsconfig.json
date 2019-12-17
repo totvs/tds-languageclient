@@ -14,6 +14,7 @@
         "allowSyntheticDefaultImports": true,
         "removeComments": true,
         "declaration": true,
+        "sourceMap": true,
         "declarationDir": "./target",
 
         "lib": [

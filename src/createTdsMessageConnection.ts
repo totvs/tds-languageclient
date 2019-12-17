@@ -1,9 +1,10 @@
 import { spawn } from 'child_process';
-import { MessageConnection, StreamMessageReader, StreamMessageWriter, createMessageConnection } from 'vscode-jsonrpc';
+import { StreamMessageReader, StreamMessageWriter, createMessageConnection } from 'vscode-jsonrpc';
 import languageServerBin from '@totvs/tds-ls';
 import { chmodSync } from 'fs';
+import { TdsMessageConnection } from './types';
 
-export default function createTdsMessageConnection(args?: string[], options?: any): MessageConnection {
+export default function createTdsMessageConnection(args?: string[], options?: any): TdsMessageConnection {
     let spawnArgs = ['--language-server'],
         spawnOptions = {
             env: process.env
@@ -36,5 +37,5 @@ export default function createTdsMessageConnection(args?: string[], options?: an
 
     connection.listen();
 
-    return connection;
+    return connection as TdsMessageConnection;
 }

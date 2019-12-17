@@ -1,15 +1,15 @@
 import createTdsMessageConnection from './createTdsMessageConnection';
-import { MessageConnection, NotificationMessage } from 'vscode-jsonrpc';
+import { NotificationMessage } from 'vscode-jsonrpc';
 import TdsServer from './TdsServer';
 import TdsMonitorServer from './TdsMonitorServer';
 import { EventEmitter } from 'events';
-import { BuildVersion } from './types';
+import { BuildVersion, TdsMessageConnection } from './types';
 
 let instance: TdsLanguageClient = null;
 
 export default class TdsLanguageClient extends EventEmitter {
 
-    private connection: MessageConnection = null;
+    private connection: TdsMessageConnection = null;
     private servers: Map<string, TdsServer> = null;
 
     private constructor() {
@@ -60,7 +60,7 @@ export default class TdsLanguageClient extends EventEmitter {
     //public async getServer<T extends TdsServer>(token: string): Promise<T>;
     //public async getServer<T extends TdsServer>(options: AuthenticationOptions): Promise<T>
 
-    public async getServer<T extends TdsServer>(ServerClass: new (connection: MessageConnection) => T, arg: any): Promise<T> {
+    public async getServer<T extends TdsServer>(ServerClass: new (connection: TdsMessageConnection) => T, arg: any): Promise<T> {
         if (typeof arg === 'string') {
             return this.servers.get(arg) as T;
         }
@@ -98,6 +98,7 @@ export default class TdsLanguageClient extends EventEmitter {
 export interface ValidationOptions {
     server: string;
     port: number;
+    bSecure: number;
 }
 
 export interface ServerValidationResult {
@@ -114,6 +115,8 @@ export interface AuthenticationOptions {
     user: string;
     password: string;
     autoReconnect: boolean;
+    bSecure?: number;
+    serverType?: number;
 }
 
 export interface ServerAuthenticationResult {
