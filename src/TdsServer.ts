@@ -88,11 +88,6 @@ export default class TdsServer {
 
             return true;
         }
-        else if (await tryAuthenticate(LS_SERVER_TYPE.LOGIX)) {
-            console.log('tryAuthenticate LS_SERVER_TYPE.LOGIX');
-
-            return true;
-        }
         else {
             console.log('tryAuthenticate FAILED');
 
