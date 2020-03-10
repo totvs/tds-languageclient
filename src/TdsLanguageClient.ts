@@ -3,7 +3,7 @@ import { NotificationMessage } from 'vscode-jsonrpc';
 import TdsServer from './TdsServer';
 import TdsMonitorServer from './TdsMonitorServer';
 import { EventEmitter } from 'events';
-import { BuildVersion, TdsMessageConnection } from './types';
+import { TdsMessageConnection } from './types';
 
 let instance: TdsLanguageClient = null;
 
@@ -24,7 +24,6 @@ export default class TdsLanguageClient extends EventEmitter {
             this.emit(e.method, e.params);
             //console.log(...arguments);
         });
-
 
         //this.connection.onNotification('', (...params) => this.emit('event', ...params))
     }
@@ -52,7 +51,7 @@ export default class TdsLanguageClient extends EventEmitter {
     }
 
     public async getMonitorServer(token: string): Promise<TdsMonitorServer>;
-    public async getMonitorServer(options: AuthenticationOptions): Promise<TdsMonitorServer>;
+    //public async getMonitorServer(options: AuthenticationOptions): Promise<TdsMonitorServer>;
     public async getMonitorServer(arg: any): Promise<TdsMonitorServer> {
         return this.getServer(TdsMonitorServer, arg);
     };
@@ -64,80 +63,33 @@ export default class TdsLanguageClient extends EventEmitter {
         if (typeof arg === 'string') {
             return this.servers.get(arg) as T;
         }
-        else {
-            const server = new ServerClass(this.connection);
+        // else {
+        //     const server = new ServerClass(this.connection);
 
-            let connected = await server.authenticate(arg as AuthenticationOptions);
+        //     let connected = await server.authenticate(arg as AuthenticationOptions);
 
-            if (connected)
-                return server;
-            else
-                return null;
-        }
+        //     if (connected)
+        //         return server;
+        //     else
+        //         return null;
+        // }
+        return null;
     }
 
-    public async validation(options: ValidationOptions): Promise<string> {
-        return this.connection
-            .sendRequest('$totvsserver/validation', {
-                validationInfo: options
-            })
-            .then((result: ServerValidationResult) => result.buildVersion);
-    }
+    // public async validation(options: ValidationOptions): Promise<string> {
+    //     return this.connection
+    //         .sendRequest('$totvsserver/validation', {
+    //             validationInfo: options
+    //         })
+    //         .then((result: ServerValidationResult) => result.buildVersion);
+    // }
 
-    public async authenticate(options: AuthenticationOptions): Promise<string> {
-        return this.connection
-            .sendRequest('$totvsserver/authentication', {
-                authenticationInfo: options
-            })
-            .then((result: ServerAuthenticationResult) => result.connectionToken);
-    }
-
-}
-
-
-export interface ValidationOptions {
-    server: string;
-    port: number;
-    bSecure: number;
-}
-
-export interface ServerValidationResult {
-    buildVersion: BuildVersion;
-}
-
-export interface AuthenticationOptions {
-    connType: number;
-    identification: string;
-    server: string;
-    port: number;
-    buildVersion: BuildVersion;
-    environment: string;
-    user: string;
-    password: string;
-    autoReconnect: boolean;
-    bSecure?: number;
-    serverType?: number;
-}
-
-export interface ServerAuthenticationResult {
-    id: any;
-    osType: number;
-    connectionToken: string;
-}
-
-export interface AuthenticationResult {
-    token: string;
-}
-
-export interface ReconnectOptions {
-    token: string;
-    servername: string;
-}
-
-export interface ReconnectResult {
-    token: string;
-    environment: string;
-    username: string;
-
+    // public async authenticate(options: AuthenticationOptions): Promise<string> {
+    //     return this.connection
+    //         .sendRequest('$totvsserver/authentication', {
+    //             authenticationInfo: options
+    //         })
+    //         .then((result: ServerAuthenticationResult) => result.connectionToken);
+    // }
 
 }

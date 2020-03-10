@@ -1,4 +1,3 @@
-import { ReconnectOptions, ServerAuthenticationResult, AuthenticationOptions } from './TdsLanguageClient';
 import createTdsMessageConnection from "./createTdsMessageConnection";
 import { BuildVersion, TdsMessageConnection } from "./types";
 
@@ -8,15 +7,16 @@ enum LS_SERVER_TYPE {
     TOVSTECX = 3
 }
 
-
 export default class TdsServer {
 
     public id: string = null;
     public token: string = null;
+    public serverType: LS_SERVER_TYPE = null; // 1:Protheus, 2:Logix, 3:TotvstecX
     public address: string = null;
     public port: number = -1;
     public build: BuildVersion = null;
     public secure = true;
+    public environment: string = null;
 
     protected connection: TdsMessageConnection = null;
 
@@ -29,38 +29,45 @@ export default class TdsServer {
         }
     }
 
-    public async authenticate(options: AuthenticationOptions): Promise<boolean> {
+    public async connect(identification: string, serverType: number, server: string, port: number, secure: boolean, buildVersion: BuildVersion, environment: string): Promise<boolean> {
+        const connectionInfo: ConnectOptions = {
+            connType: 1,
+            serverName: identification,
+            identification: identification,
+            serverType: serverType,
+            server: server,
+            port: port,
+            bSecure: secure ? 1 : 0,
+            buildVersion: buildVersion,
+            autoReconnect: true,
+            environment: environment
+        };
+
         return this.connection
-            .sendRequest('$totvsserver/authentication', {
-                authenticationInfo: options
+            .sendRequest('$totvsserver/connect', {
+                connectionInfo: connectionInfo
             })
             .then(
-                (result: ServerAuthenticationResult) => {
+                (result: ServerConnectionResult) => {
                     this.token = result.connectionToken;
+                    this.environment = environment;
 
                     return true;
                 },
                 ((error: Error) => {
+                    this.token = null;
+                    console.log(error);
                     return false
                 }));
     }
 
-    public async connect(options: ConnectOptions): Promise<boolean> {
-
-
-        const tryAuthenticate = (serverType: LS_SERVER_TYPE): Promise<boolean> => {
+    public async authenticate(user: string, password: string): Promise<boolean> {
+        const tryAuthenticate = (): Promise<boolean> => {
             const authenticationInfo: AuthenticationOptions = {
-                connType: 1,
-                identification: this.id,
-                server: this.address,
-                port: this.port,
-                buildVersion: this.build,
-                autoReconnect: true,
-                user: options.username,
-                password: options.password,
-                environment: options.environment,
-                bSecure: this.secure ? 1 : 0,
-                serverType: serverType
+                connectionToken: this.token,
+                user: user,
+                password: password,
+                environment: this.environment
             };
 
             return this.connection
@@ -74,41 +81,13 @@ export default class TdsServer {
                         return true;
                     },
                     ((error: Error) => {
+                        this.token = null;
+                        console.log(error);
                         return false
                     }));
         };
 
-        if (await tryAuthenticate(LS_SERVER_TYPE.PROTHEUS)) {
-            console.log('tryAuthenticate LS_SERVER_TYPE.PROTHEUS');
-
-            return true;
-        }
-        else if (await tryAuthenticate(LS_SERVER_TYPE.TOVSTECX)) {
-            console.log('tryAuthenticate LS_SERVER_TYPE.TOVSTECX');
-
-            return true;
-        }
-        else {
-            console.log('tryAuthenticate FAILED');
-
-            return false;
-        }
-
-        /*
-        return this.connection
-            .sendRequest('$totvsserver/authentication', {
-                authenticationInfo: authenticationInfo
-            })
-            .then(
-                (result: ServerAuthenticationResult) => {
-                    this.token = result.connectionToken;
- 
-                    return true;
-                },
-                ((error: Error) => {
-                    return false
-                }));
-                */
+        return await tryAuthenticate();
     }
 
     public async disconnect() {
@@ -120,23 +99,27 @@ export default class TdsServer {
                 }
             })
             .then((response: any) => response.message);
+        this.token = null;
     }
 
-    public async reconnect(options?: ReconnectOptions): Promise<boolean> {
-        if ((options) && (options.token)) {
-            this.token = options.token;
+    public async reconnect(connectionToken?: string): Promise<boolean> {
+        if (connectionToken) {
+            this.token = connectionToken;
         }
+        const reconnectInfo: ReconnectOptions = {
+            connectionToken: this.token,
+            serverName: this.id
+        };
 
         return this.connection
             .sendRequest('$totvsserver/reconnect', {
-                reconnectInfo: {
-                    connectionToken: this.token,
-                    serverName: this.id
-                }
+                reconnectInfo: reconnectInfo
             }).then((result: ServerReconnectResult) => {
                 return true;
             },
                 ((error: Error) => {
+                    this.token = null;
+                    console.log(error);
                     return false
                 }));
     }
@@ -145,14 +128,15 @@ export default class TdsServer {
         if ((this.address === null) || (this.port === -1))
             return false;
 
-        const tryValidate = ((secure: boolean): Promise<boolean> => {
+        const tryValidate = ((): Promise<boolean> => {
+            const validationInfo: ValidationOptions = {
+                server: this.address,
+                port: this.port
+            };
+
             return this.connection
                 .sendRequest<ServerValidationResult>('$totvsserver/validation', {
-                    validationInfo: {
-                        server: this.address,
-                        port: this.port,
-                        bSecure: secure ? 1 : 0
-                    }
+                    validationInfo: validationInfo
                 })
                 .then(
                     (result: ServerValidationResult) => {
@@ -162,59 +146,17 @@ export default class TdsServer {
                             return false;
 
                         this.build = result.buildVersion;
-                        this.id = result.id;
+                        this.secure = (result.secure == 1);
 
                         return true;
                     },
                     ((error: Error) => {
                         console.log(error);
-
                         return false
                     }));
-
-
         });
 
-        if (await tryValidate(true)) {
-            console.log('tryValidate true');
-
-            this.secure = true;
-            return true;
-        }
-        else if (await tryValidate(false)) {
-            console.log('tryValidate false');
-
-            this.secure = false;
-            return true;
-        }
-        else {
-            console.log('tryValidate failed');
-
-            return false;
-        }
-
-        /*
-        return this.connection
-            .sendRequest('$totvsserver/validation', {
-                validationInfo: {
-                    server: this.address,
-                    port: this.port,
-                    bSecure: false
-                }
-            })
-            .then(
-                (result: ServerValidationResult) => {
-                    console.log('$totvsserver/validation', result);
- 
-                    this.build = result.buildVersion;
-                    this.id = result.id;
- 
-                    return true;
-                },
-                ((error: Error) => {
-                    return false
-                }));
-                */
+        return await tryValidate();
     }
 
     public async stopServer() {
@@ -228,15 +170,50 @@ export default class TdsServer {
     }
 }
 
-export interface ConnectOptions {
+interface ValidationOptions {
+    server: string;
+    port: number;
+}
+
+interface ConnectOptions {
+    connType: number;
+    serverName: string;
+    identification: string;
+    serverType: number;
+    server: string;
+    port: number;
+    bSecure: number;
+    buildVersion: BuildVersion;
     environment: string;
-    username: string;
+    autoReconnect: boolean;
+}
+
+interface AuthenticationOptions {
+    connectionToken: string;
+    environment: string;
+    user: string;
     password: string;
 }
 
+interface ReconnectOptions {
+    connectionToken: string;
+    serverName: string;
+}
+
 interface ServerValidationResult {
-    id: string;
     buildVersion: BuildVersion | '';
+    secure: number;
+}
+
+interface ServerConnectionResult {
+    id: any;
+    osType: number;
+    connectionToken: string;
+}
+
+interface ServerAuthenticationResult {
+    id: any;
+    connectionToken: string;
 }
 
 interface ServerReconnectResult {
