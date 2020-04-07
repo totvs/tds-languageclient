@@ -31,7 +31,7 @@ export default class TdsServer {
 
     public async connect(identification: string, serverType: number, server: string, port: number, secure: boolean, buildVersion: BuildVersion, environment: string): Promise<boolean> {
         const connectionInfo: ConnectOptions = {
-            connType: 1,
+            connType: 13,
             serverName: identification,
             identification: identification,
             serverType: serverType,
