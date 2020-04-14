@@ -1,5 +1,6 @@
 import createTdsMessageConnection from "./createTdsMessageConnection";
 import { BuildVersion, TdsMessageConnection } from "./types";
+import { MonitorUser } from "./TdsMonitorServer";
 
 enum LS_SERVER_TYPE {
     PROTHEUS = 1,
@@ -9,6 +10,7 @@ enum LS_SERVER_TYPE {
 
 export default class TdsServer {
 
+    public isConnected: boolean = false;
     public id: string = null;
     public token: string = null;
     public serverType: LS_SERVER_TYPE = null; // 1:Protheus, 2:Logix, 3:TotvstecX
@@ -17,6 +19,8 @@ export default class TdsServer {
     public build: BuildVersion = null;
     public secure = true;
     public environment: string = null;
+    public lastGetUsers: number = 0;
+    public usersList: MonitorUser[] = [];
 
     protected connection: TdsMessageConnection = null;
 
@@ -51,7 +55,7 @@ export default class TdsServer {
                 (result: ServerConnectionResult) => {
                     this.token = result.connectionToken;
                     this.environment = environment;
-
+                    this.isConnected = !result.needAuthentication;
                     return true;
                 },
                 ((error: Error) => {
@@ -77,7 +81,7 @@ export default class TdsServer {
                 .then(
                     (result: ServerAuthenticationResult) => {
                         this.token = result.connectionToken;
-
+                        this.isConnected = true;
                         return true;
                     },
                     ((error: Error) => {
@@ -99,6 +103,7 @@ export default class TdsServer {
                 }
             })
             .then((response: any) => response.message);
+        this.isConnected = false;
         this.token = null;
     }
 
@@ -107,6 +112,7 @@ export default class TdsServer {
             this.token = connectionToken;
         }
         const reconnectInfo: ReconnectOptions = {
+            connType: 13,
             connectionToken: this.token,
             serverName: this.id
         };
@@ -115,6 +121,8 @@ export default class TdsServer {
             .sendRequest('$totvsserver/reconnect', {
                 reconnectInfo: reconnectInfo
             }).then((result: ServerReconnectResult) => {
+                this.token = result.connectionToken;
+                this.isConnected = true;
                 return true;
             },
                 ((error: Error) => {
@@ -198,6 +206,7 @@ interface AuthenticationOptions {
 interface ReconnectOptions {
     connectionToken: string;
     serverName: string;
+    connType: number;
 }
 
 interface ServerValidationResult {
@@ -209,6 +218,7 @@ interface ServerConnectionResult {
     id: any;
     osType: number;
     connectionToken: string;
+    needAuthentication: boolean;
 }
 
 interface ServerAuthenticationResult {

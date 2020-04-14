@@ -15,6 +15,9 @@ export default function createTdsMessageConnection(args?: string[], options?: an
         spawnArgs.push(...args);
     }
 
+    // activate logging
+    //spawnArgs.push("--log-file=totvsls.log", "--record=totvsls");
+
     if (options) {
         Object.assign(spawnOptions, options);
     }

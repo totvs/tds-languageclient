@@ -3,13 +3,24 @@ import TdsServer from "./TdsServer";
 export default class TdsMonitorServer extends TdsServer {
 
     public async getUsers(): Promise<MonitorUser[]> {
+        if (!this.isConnected) {
+            return [];
+        }
+        var timeInMs = Date.now();
+        if (timeInMs - this.lastGetUsers < 1000) {
+            return this.usersList;
+        }
+        this.lastGetUsers = timeInMs;
         return this.connection
             .sendRequest('$totvsmonitor/getUsers', {
                 getUsersInfo: {
                     connectionToken: this.token
                 }
             })
-            .then((response: any) => response.mntUsers,
+            .then((response: any) => {
+                this.usersList = response.mntUsers
+                return this.usersList;
+            },
                 ((error: Error) => {
                     return null
                 })
