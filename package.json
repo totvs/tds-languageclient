@@ -11,6 +11,7 @@
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./target",
+    "link": "npm link",
     "lint": "eslint ./src/**",
     "prepublish": "npm run clean && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
