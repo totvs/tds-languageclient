@@ -139,7 +139,8 @@ export default class TdsServer {
         const tryValidate = ((): Promise<boolean> => {
             const validationInfo: ValidationOptions = {
                 server: this.address,
-                port: this.port
+                port: this.port,
+                connType: 13
             };
 
             return this.connection
@@ -181,6 +182,7 @@ export default class TdsServer {
 interface ValidationOptions {
     server: string;
     port: number;
+    connType: number;
 }
 
 interface ConnectOptions {
