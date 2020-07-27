@@ -6,57 +6,64 @@ export default class TdsMonitorServer extends TdsServer {
         if (!this.isConnected) {
             return [];
         }
-        var timeInMs = Date.now();
+
+        const timeInMs = Date.now();
+        
         if (timeInMs - this.lastGetUsers < 1000) {
             return this.usersList;
         }
+
         this.lastGetUsers = timeInMs;
+        
         return this.connection
             .sendRequest('$totvsmonitor/getUsers', {
                 getUsersInfo: {
                     connectionToken: this.token
                 }
             })
-            .then((response: any) => {
+            .then((response: GetUsersResponse) => {
                 this.usersList = response.mntUsers
+                
                 return this.usersList;
             },
-                ((error: Error) => {
+                (() => {
                     return null
                 })
             );
     }
 
-    public async appKillUser(userName: string, computerName: string, threadId: number, serverName: string) {
-        this.connection
+    public async appKillUser(userName: string, computerName: string, threadId: number, serverName: string, environment: string): Promise<string> {
+        return this.connection
             .sendRequest('$totvsmonitor/appKillUser', {
                 appKillUserInfo: {
                     connectionToken: this.token,
                     userName: userName,
                     computerName: computerName,
                     threadId: threadId,
-                    serverName: serverName
+                    serverName: serverName,
+                    environment: environment
                 }
             })
-            .then((response: any) => response.message);
+            .then((response: AppKillUserResponse) => response.message);
     }
 
-    public async killUser(userName: string, computerName: string, threadId: number, serverName: string) {
-        this.connection
+    public async killUser(userName: string, computerName: string, threadId: number, serverName: string, environment: string): Promise<string> {
+        return this.connection
             .sendRequest('$totvsmonitor/killUser', {
                 killUserInfo: {
                     connectionToken: this.token,
                     userName: userName,
                     computerName: computerName,
                     threadId: threadId,
-                    serverName: serverName
+                    serverName: serverName,
+                    environment: environment
                 }
             })
-            .then((response: any) => response.message);
+            .then((response: KillUserResponse) => response.message);
     }
 
-    public async sendUserMessage(userName: string, computerName: string, threadId: number, serverName: string, message: string) {
-        this.connection
+    public async sendUserMessage(userName: string, computerName: string, threadId: number, serverName: string, message: string, environment: string): Promise<string> {
+        return this.connection
             .sendRequest('$totvsmonitor/sendUserMessage', {
                 sendUserMessageInfo: {
                     connectionToken: this.token,
@@ -64,10 +71,11 @@ export default class TdsMonitorServer extends TdsServer {
                     computerName: computerName,
                     threadId: threadId,
                     serverName: serverName,
-                    message: message
+                    message: message,
+                    environment: environment
                 }
             })
-            .then((response: any) => response.message);
+            .then((response: SendUserMessageResponse) => response.message);
     }
 
     public async getConnectionStatus(): Promise<boolean> {
@@ -77,18 +85,18 @@ export default class TdsMonitorServer extends TdsServer {
                     connectionToken: this.token
                 }
             })
-            .then((response: any) => response.status);
+            .then((response: GetConnectionStatusResponse) => response.status);
     }
 
-    public async setConnectionStatus(status: boolean) {
-        this.connection
+    public async setConnectionStatus(status: boolean): Promise<string> {
+        return this.connection
             .sendRequest('$totvsmonitor/setConnectionStatus', {
                 setConnectionStatusInfo: {
                     connectionToken: this.token,
                     status: status
                 }
             })
-            .then((response: any) => response.message);
+            .then((response: SetConnectionStatusResponse) => response.message);
     }
 }
 
@@ -110,3 +118,28 @@ export interface MonitorUser {
     clientType: string;
     inactiveTime: string;
 }
+
+export interface GetUsersResponse {
+    mntUsers: Array<MonitorUser>
+}
+
+export interface SendUserMessageResponse {
+    message: string;
+}
+
+export interface KillUserResponse {
+    message: string;
+}
+
+export interface AppKillUserResponse {
+    message: string;
+}
+
+export interface SetConnectionStatusResponse {
+    message: string;
+}
+
+export interface GetConnectionStatusResponse {
+    status: boolean;
+}
+
