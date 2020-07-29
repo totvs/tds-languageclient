@@ -65,71 +65,71 @@ export default class TdsServer {
                 }));
     }
 
-    public async authenticate(user: string, password: string): Promise<boolean> {
-        const tryAuthenticate = (): Promise<boolean> => {
-            const authenticationInfo: AuthenticationOptions = {
-                connectionToken: this.token,
-                user: user,
-                password: password,
-                environment: this.environment
-            };
-
-            return this.connection
-                .sendRequest('$totvsserver/authentication', {
-                    authenticationInfo: authenticationInfo
-                })
-                .then(
-                    (result: ServerAuthenticationResult) => {
-                        this.token = result.connectionToken;
-                        this.isConnected = true;
-                        return true;
-                    },
-                    ((error: Error) => {
-                        this.token = null;
-                        console.log(error);
-                        return false
-                    }));
+    public async authenticate(user: string, password: string, encoding?: ServerEncoding): Promise<boolean> {
+        const authenticationInfo: AuthenticationOptions = {
+            connectionToken: this.token,
+            user: user,
+            password: password,
+            environment: this.environment,
+            encoding: encoding
         };
 
-        return await tryAuthenticate();
+        return this.connection
+            .sendRequest('$totvsserver/authentication', {
+                authenticationInfo: authenticationInfo
+            })
+            .then(
+                (result: ServerAuthenticationResult) => {
+                    this.token = result.connectionToken;
+                    this.isConnected = true;
+                    return true;
+                },
+                ((error: Error) => {
+                    //this.token = null;
+                    console.log(error);
+                    return false
+                }));
+
     }
 
-    public async disconnect() {
-        this.connection
+    public async disconnect(): Promise<string> {
+        return this.connection
             .sendRequest('$totvsserver/disconnect', {
                 disconnectInfo: {
                     connectionToken: this.token,
                     serverName: this.id
                 }
             })
-            .then((response: any) => response.message);
-        this.isConnected = false;
-        this.token = null;
+            .then((response: DisconnectResult) => {
+                this.isConnected = false;
+                this.token = null;
+
+                return response.message
+            });
     }
 
-    public async reconnect(connectionToken?: string): Promise<boolean> {
-        if (connectionToken) {
-            this.token = connectionToken;
-        }
-        const reconnectInfo: ReconnectOptions = {
+    public async reconnect(options?: Partial<ReconnectOptions>): Promise<boolean> {
+        const reconnectInfo: ReconnectOptions = Object.assign({
             connType: 13,
             connectionToken: this.token,
             serverName: this.id
-        };
+        }, options || {});
 
         return this.connection
             .sendRequest('$totvsserver/reconnect', {
                 reconnectInfo: reconnectInfo
-            }).then((result: ServerReconnectResult) => {
+            })
+            .then((result: ServerReconnectResult) => {
                 this.token = result.connectionToken;
                 this.isConnected = true;
+
                 return true;
-            },
-                ((error: Error) => {
-                    this.token = null;
-                    console.log(error);
-                    return false
-                }));
+            })
+            .catch((error: Error) => {
+                console.log(error);
+
+                return false
+            });
     }
 
     public async validate(): Promise<boolean> {
@@ -179,6 +179,8 @@ export default class TdsServer {
     }
 }
 
+declare type ServerEncoding = 'CP1252' | 'CP1251';
+
 interface ValidationOptions {
     server: string;
     port: number;
@@ -203,12 +205,14 @@ interface AuthenticationOptions {
     environment: string;
     user: string;
     password: string;
+    encoding: ServerEncoding;
 }
 
 interface ReconnectOptions {
     connectionToken: string;
     serverName: string;
     connType: number;
+    encoding?: ServerEncoding
 }
 
 interface ServerValidationResult {
@@ -232,4 +236,8 @@ interface ServerReconnectResult {
     connectionToken: string;
     environment: string;
     user: string;
+}
+
+interface DisconnectResult {
+    message: string;
 }
