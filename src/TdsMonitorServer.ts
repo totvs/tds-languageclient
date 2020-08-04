@@ -117,6 +117,7 @@ export interface MonitorUser {
     ctreeTaskId: number;
     clientType: string;
     inactiveTime: string;
+    appUser: string;
 }
 
 export interface GetUsersResponse {
