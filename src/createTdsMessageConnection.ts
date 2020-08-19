@@ -4,7 +4,7 @@ import languageServerBin from '@totvs/tds-ls';
 import { chmodSync } from 'fs';
 import { TdsMessageConnection } from './types';
 
-export default function createTdsMessageConnection(args?: string[], options?: any): TdsMessageConnection {
+export default function createTdsMessageConnection(logging: boolean, args?: string[], options?: any): TdsMessageConnection {
     let spawnArgs = ['--language-server'],
         spawnOptions = {
             env: process.env
@@ -16,7 +16,9 @@ export default function createTdsMessageConnection(args?: string[], options?: an
     }
 
     // activate logging
-    //spawnArgs.push("--log-file=totvsls.log", "--record=totvsls");
+    if (logging) {
+        spawnArgs.push("--log-file=totvsls.log", "--log-file-append=totvsls_full.log", "--record=totvsls");
+    }
 
     if (options) {
         Object.assign(spawnOptions, options);

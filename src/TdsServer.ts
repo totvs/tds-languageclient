@@ -29,7 +29,7 @@ export default class TdsServer {
             this.connection = connection;
         }
         else {
-            this.connection = createTdsMessageConnection();
+            this.connection = createTdsMessageConnection(false);
         }
     }
 

@@ -12,10 +12,11 @@ export default class TdsLanguageClient extends EventEmitter {
     private connection: TdsMessageConnection = null;
     private servers: Map<string, TdsServer> = null;
 
-    private constructor() {
+    private constructor(options?: any) {
         super();
 
-        this.connection = createTdsMessageConnection();
+        const logging = (options && options.logging) ? options.logging : false;
+        this.connection = createTdsMessageConnection(logging);
         this.servers = new Map();
 
         //this.connection.onUnhandledNotification(e: NotificationMessage) =>  console.log(e));
@@ -38,9 +39,9 @@ export default class TdsLanguageClient extends EventEmitter {
     }
     */
 
-    public static instance(): TdsLanguageClient {
+    public static instance(options?: any): TdsLanguageClient {
         if (instance === null) {
-            instance = new TdsLanguageClient();
+            instance = new TdsLanguageClient(options);
         }
 
         return instance;
