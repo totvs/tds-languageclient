@@ -22,6 +22,7 @@ export default class TdsMonitorServer extends TdsServer {
                 }
             })
             .then((response: GetUsersResponse) => {
+                console.log("...getUsers: "+(Date.now()-timeInMs)+" ms");
                 this.usersList = response.mntUsers
                 
                 return this.usersList;
