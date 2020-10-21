@@ -85,7 +85,7 @@ export default class TdsServer {
                     return true;
                 },
                 ((error: Error) => {
-                    //this.token = null;
+                    this.token = null;
                     console.log(error);
                     return false
                 }));
