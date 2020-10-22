@@ -102,7 +102,6 @@ export default class TdsServer {
             })
             .then((response: DisconnectResult) => {
                 this.isConnected = false;
-                this.token = null;
 
                 return response.message
             });
