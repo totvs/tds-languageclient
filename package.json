@@ -21,7 +21,7 @@
     "url": "git+https://github.com/totvs/tds-languageclient.git"
   },
   "author": "TOTVS S.A.",
-  "license": "MIT",
+   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/totvs/tds-languageclient/issues"
   },
