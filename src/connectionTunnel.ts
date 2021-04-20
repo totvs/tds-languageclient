@@ -1,18 +1,14 @@
 import { spawn } from 'child_process';
-import {
-  StreamMessageReader,
-  StreamMessageWriter,
-  createMessageConnection,
-} from 'vscode-jsonrpc';
+import { StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc';
 import languageServerBin from '@totvs/tds-ls';
 import { chmodSync } from 'fs';
-import { TdsMessageConnection } from './types';
+import { IMessageConnection } from './types';
 
-export default function createTdsMessageConnection(
+export function createMessageConnection(
   logging: boolean,
   args?: string[],
   options?: any
-): TdsMessageConnection {
+): IMessageConnection {
   const spawnArgs = ['--language-server'],
     spawnOptions = {
       env: process.env,
@@ -54,5 +50,5 @@ export default function createTdsMessageConnection(
 
   connection.listen();
 
-  return connection as TdsMessageConnection;
+  return connection as IMessageConnection;
 }
