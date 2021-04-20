@@ -1,14 +1,18 @@
 import { spawn } from 'child_process';
-import { StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc';
+import {
+  StreamMessageReader,
+  StreamMessageWriter,
+  createMessageConnection,
+} from 'vscode-jsonrpc';
 import languageServerBin from '@totvs/tds-ls';
 import { chmodSync } from 'fs';
-import { IMessageConnection } from './types';
+import { TdsMessageConnection } from './types';
 
-export function createConnectionTunnel(
+export default function createTdsMessageConnection(
   logging: boolean,
   args?: string[],
   options?: any
-): IMessageConnection {
+): TdsMessageConnection {
   const spawnArgs = ['--language-server'],
     spawnOptions = {
       env: process.env,
@@ -43,19 +47,12 @@ export function createConnectionTunnel(
   const childProcess = spawn(bin, spawnArgs, spawnOptions);
 
   // Use stdin and stdout for communication:
-  const connection = TunnelConnection(
+  const connection = createMessageConnection(
     new StreamMessageReader(childProcess.stdout),
     new StreamMessageWriter(childProcess.stdin)
   );
 
   connection.listen();
 
-  return connection as IMessageConnection;
-}
-
-function TunnelConnection(
-  arg0: StreamMessageReader,
-  arg1: StreamMessageWriter
-) {
-  throw new Error('Function not implemented.');
+  return connection as TdsMessageConnection;
 }
