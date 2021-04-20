@@ -1,47 +1,88 @@
 {
   "name": "@totvs/tds-languageclient",
-  "version": "0.0.33",
-  "description": "TOTVS Language Client",
-  "main": "./target/index.js",
-  "types": "./target/index.d.ts",
-  "files": [
-    "target"
-  ],
-  "scripts": {
-    "build": "tsc -p .",
-    "watch": "tsc -w -p .",
-    "clean": "rimraf ./target",
-    "link": "npm link",
-    "lint": "eslint ./src/**",
-    "prepublish": "npm run clean && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "description": "TOTVS Language Client e Language Server Protocol",
+  "version": "1.0.0",
+  "publisher": "TOTVS",
+  "author": {
+    "name": "TOTVS",
+    "email": "tecnologia@totvs.com.br"
   },
+  "license": "Apache-2.0",
+  "keywords": [
+    "advPL",
+    "4gl",
+    "tds",
+    "totvs",
+    "lsp",
+    "dap"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/totvs/tds-languageclient.git"
   },
-  "author": "TOTVS S.A.",
-  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/totvs/tds-languageclient/issues"
   },
   "homepage": "https://github.com/totvs/tds-languageclient#readme",
+  "engines": {
+    "node": ">= 8.0.0"
+  },
+  "main": "lib/index.js",
+  "types": "typings/index.d.ts",
+  "files": [
+    "lib/",
+    "typings/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "clean": "rimraf ./lib && rimraf ./typings",
+    "build": "tsc --version && tsc -p ./src",
+    "watch": "tsc -p ./src --watch",
+    "prebuild": "npm run clean",
+    "---TEST---": "",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:snapshot": "npm run test -- --updateSnapshot",
+    "test:singlefile": "npm run test -- --testNamePattern hello1.prw -u",
+    "test:folder": "--testPathPattern",
+    "test:coverage": "npm run test -- --coverage",
+    "test:onlyFailures": "npm run test --onlyFailures ",
+    "pretest": "npm run build",
+    "---RELEASE---": "",
+    "release": "npx standard-version",
+    "to_publish": "git push --follow-tags origin develop && npm publish --access public",
+    "prepack": "npm run build",
+    "prepublish": "npm run clean && npm run build",
+    "---MISC---": "",
+    "lint": "eslint ./src/**",
+    "contributors:check": "npx all-contributors-cli check",
+    "contributors:generate": "npx all-contributors-cli generate",
+    "link:": ""
+  },
   "dependencies": {
     "@totvs/tds-ls": "^1.1.35",
+    "all-contributors-cli": "^6.20.0",
+    "typescript": "^4.2.4",
     "vscode-jsonrpc": "^5.0.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^12.0.0",
+    "@commitlint/config-conventional": "^12.0.0",
     "@types/node": "^14.11.4",
     "@typescript-eslint/eslint-plugin": "^3.10.1",
     "@typescript-eslint/parser": "^3.10.1",
     "eslint": "^7.10.0",
     "rimraf": "^3.0.2",
-    "typescript": "^3.9.7"
+    "jest": "^26.6.3",
+    "jest-watch-typeahead": "^0.6.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   },
   "eslintIgnore": [
-    "target/**"
-  ],
-  "keywords": [
-    "tds"
+    "lib/**",
+    "typings/**"
   ]
 }

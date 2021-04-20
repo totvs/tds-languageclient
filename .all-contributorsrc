@@ -1,0 +1,97 @@
+{
+  "projectName": "tds-languageclient",
+  "projectOwner": "totvs",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 50,
+  "commit": false,
+  "commitConvention": "gitmoji",
+  "contributors": [
+    {
+      "login": "brodao",
+      "name": "Alan Cândido",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/949914?v=4",
+      "profile": "https://github.com/brodao",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "acacioegas",
+      "name": "Acacio Egas",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/369099?v=4",
+      "profile": "https://github.com/acacioegas",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "rogeriorc",
+      "name": "Rogério Ribeiro da Cruz",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/2599798?v=4",
+      "profile": "https://github.com/rogeriorc",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "caiadofelipe",
+      "name": "FELIPE CAIADO ALMEIDA",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/49681823?v=4",
+      "profile": "https://github.com/caiadofelipe",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "isaquerochak",
+      "name": "isaquerochak",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/19375217?v=4",
+      "profile": "https://github.com/isaquerochak",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "rodrigopg",
+      "name": "Rodrigo Gonçalves",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/5282959?v=4",
+      "profile": "https://github.com/rodrigopg",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "alexmmartins",
+      "name": "alexmmartins",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/24897997?v=4",
+      "profile": "https://github.com/alexmmartins",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "guilhermebigois",
+      "name": "Guilherme Bigois",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/22408258?v=4",
+      "profile": "https://github.com/guilhermebigois",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "lwtnb-wrk",
+      "name": "lwtnb-wrk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49563478?v=4",
+      "profile": "https://github.com/lwtnb-wrk",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 6
+}
