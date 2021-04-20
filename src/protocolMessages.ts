@@ -2,7 +2,8 @@ import { ResponseError } from 'vscode-jsonrpc';
 import { IConnectionInfo, IConnectionResult } from './protocolTypes';
 import { IMessageConnection } from './types';
 
-export function sendConnectRequest(connection: IMessageConnection,
+export function sendConnectRequest(
+  connection: IMessageConnection,
   requestData: IConnectionInfo
 ): Thenable<IConnectionResult> {
   return connection
@@ -10,22 +11,18 @@ export function sendConnectRequest(connection: IMessageConnection,
       connectionInfo: requestData,
     })
     .then(
-      (connectionNode: IConnectionResult) => {
-        if (connectionNode.))
-        let token: string = connectionNode.connectionToken;
-        if (token) {
-          return {
-            sucess: true,
-            token: token,
-            needAuthentication: connectionNode.needAuthentication,
-          };
-        } else {
-          return { sucess: false, token: '', needAuthentication: false };
-        }
+      (connectionResult: IConnectionResult) => {
+        return connectionResult;
       },
       (err: ResponseError<object>) => {
         //        vscode.window.showErrorMessage(err.message);
-        return { sucess: false, token: '', needAuthentication: false };
+        const result: IConnectionResult = {
+          id: '',
+          osType: 0,
+          connectionToken: '',
+          needAuthentication: false,
+        };
+        return result;
       }
     );
 }

@@ -1,6 +1,5 @@
 import {
   BuildVersion,
-  IMessageConnection,
   IServer,
   IServerOperations,
   LS_CONNECTION_TYPE,
@@ -8,9 +7,8 @@ import {
 } from './types';
 
 import { Url } from 'url';
-import { createConnectionTunnel } from './connectionTunnel';
-import { IConnectionInfo } from './protocolTypes';
-import { sendConnectRequest } from './protocolMessages';
+import { IConnectionResult } from './protocolTypes';
+import { tdsLanguageClient, TdsLanguageClient } from './languageClient';
 
 export class ServerInformation implements IServer, IServerOperations {
   private _id: string = null;
@@ -22,7 +20,8 @@ export class ServerInformation implements IServer, IServerOperations {
   private _build: BuildVersion = null;
   private _secure = true;
   private _environment: string = null;
-  private _connection: IMessageConnection = null;
+  private _connection: TdsLanguageClient = null;
+  private _needAuthentication: boolean;
 
   public get serverName(): string {
     return this._serverName;
@@ -81,65 +80,46 @@ export class ServerInformation implements IServer, IServerOperations {
   public set environment(value: string) {
     this._environment = value;
   }
-  public get connection(): IMessageConnection {
+  public get connection(): TdsLanguageClient {
     return this._connection;
   }
-  public set connection(value: IMessageConnection) {
-    this._connection = value;
+  public get needAuthentication(): boolean {
+    return this._needAuthentication;
+  }
+  public set needAuthentication(value: boolean) {
+    this._needAuthentication = value;
   }
 
-  public constructor(connection?: IMessageConnection) {
-    this._connection = !connection ? connection : createConnectionTunnel(false);
+  public constructor() {
+    this._connection = tdsLanguageClient;
   }
 
-  public connect(
+  public async connect(
     connectionType: LS_CONNECTION_TYPE,
     environment: string
   ): Promise<boolean> {
-    if (this.connected) {
-      return Promise.reject(false);
-    }
+    return await this.connection
+      .connect(this, connectionType, environment)
+      .then(
+        (result: IConnectionResult) => {
+          this.environment = environment;
+          this.needAuthentication = !result.needAuthentication;
+          this.token = result.connectionToken;
+          this.connected = true;
 
-    const connectionInfo: IConnectionInfo = {
-      connType: connectionType,
-      identification: this.id,
-      serverType: this.serverType,
-      serverName: this.serverName,
-      server: this.address.hostname,
-      port: Number.parseInt(this.address.port),
-      bSecure: this.secure,
-      buildVersion: this.build,
-      environment: environment,
-      autoReconnect: true,
-    };
+          return true;
+        },
+        (error: Error) => {
+          this.token = null;
+          this.connected = false;
 
-    const result: any = sendConnectRequest(
-      this.connection,
-      connectionInfo
-    ).then(
-      (result: ServerConnectionResult) => {
-        this.token = result.connectionToken;
-        this.environment = environment;
-        this.connected = !result.needAuthentication;
-        return true;
-      },
-      (error: Error) => {
-        this.token = null;
-        console.log(error);
-        return false;
-      }
-    );
-    return result;
-    // .then(
-    //   (value: boolean) => {
-    //     return value;
-    //   },
-    //   (value: boolean) => {
-    //     return value;
-    //   }
-    // );
+          console.log(error);
+          return false;
+        }
+      );
   }
-
+}
+/*
   public async authenticate(
     user: string,
     password: string,
@@ -302,12 +282,6 @@ interface ServerValidationResult {
   secure: number;
 }
 
-interface ServerConnectionResult {
-  id: any;
-  osType: number;
-  connectionToken: string;
-  needAuthentication: boolean;
-}
 
 interface ServerAuthenticationResult {
   id: any;
@@ -323,3 +297,4 @@ interface ServerReconnectResult {
 interface DisconnectResult {
   message: string;
 }
+*/

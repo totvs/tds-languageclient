@@ -15,11 +15,10 @@
         "removeComments": true,
         "declaration": true,
         "sourceMap": true,
-        "declarationDir": "./target",
-
+        "declarationDir": "./typings",
+        "outDir": "./lib",
         "lib": [
             "es2015"
         ],
-        "outDir": "./target"
     }
 }

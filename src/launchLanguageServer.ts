@@ -1,10 +1,14 @@
 import { spawn } from 'child_process';
-import { StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc';
+import {
+  createMessageConnection,
+  StreamMessageReader,
+  StreamMessageWriter,
+} from 'vscode-jsonrpc';
 import languageServerBin from '@totvs/tds-ls';
 import { chmodSync } from 'fs';
 import { IMessageConnection } from './types';
 
-export function createMessageConnection(
+export function launchLanguageServer(
   logging: boolean,
   args?: string[],
   options?: any
