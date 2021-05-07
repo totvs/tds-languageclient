@@ -1,3 +1,18 @@
+/*
+Copyright 2021 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 import {
   MessageConnection,
   RequestType0,
@@ -13,47 +28,61 @@ import {
   RequestType8,
   RequestType9,
 } from 'vscode-jsonrpc';
+import { LogLevel } from './logger';
+import {
+  ICompileExtraOptions,
+  ICompileResult,
+  IReconnectOptions,
+  IResponseStatus,
+  IRpoTokenResult,
+  LS_CONNECTION_TYPE,
+  LS_SERVER_ENCODING,
+} from './protocolTypes';
 
-import { Url } from 'url';
+export interface IStartLSOptions {
+  logging: boolean;
+  trace: 'messages' | 'verbose' | 'off';
+  verbose: LogLevel;
+}
 
 export interface IMessageConnection extends MessageConnection {
-  sendRequest<R, E, RO>(
-    type: RequestType0<R, E, RO>,
+  sendRequest<R, E>(
+    type: RequestType0<R, E>,
     token?: CancellationToken
   ): Promise<R>;
-  sendRequest<P, R, E, RO>(
-    type: RequestType<P, R, E, RO>,
+  sendRequest<P, R, E>(
+    type: RequestType<P, R, E>,
     params: P,
     token?: CancellationToken
   ): Promise<R>;
-  sendRequest<P1, R, E, RO>(
-    type: RequestType1<P1, R, E, RO>,
+  sendRequest<P1, R, E>(
+    type: RequestType1<P1, R, E>,
     p1: P1,
     token?: CancellationToken
   ): Promise<R>;
-  sendRequest<P1, P2, R, E, RO>(
-    type: RequestType2<P1, P2, R, E, RO>,
+  sendRequest<P1, P2, R, E>(
+    type: RequestType2<P1, P2, R, E>,
     p1: P1,
     p2: P2,
     token?: CancellationToken
   ): Promise<R>;
-  sendRequest<P1, P2, P3, R, E, RO>(
-    type: RequestType3<P1, P2, P3, R, E, RO>,
+  sendRequest<P1, P2, P3, R, E>(
+    type: RequestType3<P1, P2, P3, R, E>,
     p1: P1,
     p2: P2,
     p3: P3,
     token?: CancellationToken
   ): Promise<R>;
-  sendRequest<P1, P2, P3, P4, R, E, RO>(
-    type: RequestType4<P1, P2, P3, P4, R, E, RO>,
+  sendRequest<P1, P2, P3, P4, R, E>(
+    type: RequestType4<P1, P2, P3, P4, R, E>,
     p1: P1,
     p2: P2,
     p3: P3,
     p4: P4,
     token?: CancellationToken
   ): Promise<R>;
-  sendRequest<P1, P2, P3, P4, P5, R, E, RO>(
-    type: RequestType5<P1, P2, P3, P4, P5, R, E, RO>,
+  sendRequest<P1, P2, P3, P4, P5, R, E>(
+    type: RequestType5<P1, P2, P3, P4, P5, R, E>,
     p1: P1,
     p2: P2,
     p3: P3,
@@ -61,8 +90,8 @@ export interface IMessageConnection extends MessageConnection {
     p5: P5,
     token?: CancellationToken
   ): Promise<R>;
-  sendRequest<P1, P2, P3, P4, P5, P6, R, E, RO>(
-    type: RequestType6<P1, P2, P3, P4, P5, P6, R, E, RO>,
+  sendRequest<P1, P2, P3, P4, P5, P6, R, E>(
+    type: RequestType6<P1, P2, P3, P4, P5, P6, R, E>,
     p1: P1,
     p2: P2,
     p3: P3,
@@ -71,8 +100,8 @@ export interface IMessageConnection extends MessageConnection {
     p6: P6,
     token?: CancellationToken
   ): Promise<R>;
-  sendRequest<P1, P2, P3, P4, P5, P6, P7, R, E, RO>(
-    type: RequestType7<P1, P2, P3, P4, P5, P6, P7, R, E, RO>,
+  sendRequest<P1, P2, P3, P4, P5, P6, P7, R, E>(
+    type: RequestType7<P1, P2, P3, P4, P5, P6, P7, R, E>,
     p1: P1,
     p2: P2,
     p3: P3,
@@ -82,8 +111,8 @@ export interface IMessageConnection extends MessageConnection {
     p7: P7,
     token?: CancellationToken
   ): Promise<R>;
-  sendRequest<P1, P2, P3, P4, P5, P6, P7, P8, R, E, RO>(
-    type: RequestType8<P1, P2, P3, P4, P5, P6, P7, P8, R, E, RO>,
+  sendRequest<P1, P2, P3, P4, P5, P6, P7, P8, R, E>(
+    type: RequestType8<P1, P2, P3, P4, P5, P6, P7, P8, R, E>,
     p1: P1,
     p2: P2,
     p3: P3,
@@ -94,8 +123,8 @@ export interface IMessageConnection extends MessageConnection {
     p8: P8,
     token?: CancellationToken
   ): Promise<R>;
-  sendRequest<P1, P2, P3, P4, P5, P6, P7, P8, P9, R, E, RO>(
-    type: RequestType9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R, E, RO>,
+  sendRequest<P1, P2, P3, P4, P5, P6, P7, P8, P9, R, E>(
+    type: RequestType9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R, E>,
     p1: P1,
     p2: P2,
     p3: P3,
@@ -127,11 +156,6 @@ export enum LS_SERVER_TYPE {
   TOVSTECX = 3,
 }
 
-export enum LS_CONNECTION_TYPE {
-  DEBUGGER = 3,
-  CONNT_MONITOR = 13,
-}
-
 export interface IRpoToken {
   file: string;
   token: string;
@@ -151,21 +175,49 @@ export interface IRpoToken {
   warning?: string;
 }
 
-export interface IServerOperations {}
+export interface ICompileOptions {
+  authorizationToken: string;
+  includesUris: string[];
+  filesUris: string[];
+  extensionsAllowed: string[];
+  extraOptions: ICompileExtraOptions;
+}
 
-export interface IServer {
-  // getId(): string;
-
-  // getRpoToken(): IRpoToken;  private _id: string = null;
+export interface ILSServer {
   id: string;
   serverName: string;
   connected: boolean;
   token: string;
   serverType: LS_SERVER_TYPE;
-  address: Url;
+  address: string;
+  port: number;
   build: BuildVersion;
   secure: boolean;
   environment: string;
+  lastError: IResponseStatus;
+
+  getExtensionsAllowed(): string[];
+
+  connect(
+    connectionType: LS_CONNECTION_TYPE,
+    environment: string
+  ): Promise<boolean>;
+
+  disconnect(): Promise<string>;
+
+  reconnect(options?: Partial<IReconnectOptions>): Promise<boolean>;
+
+  authenticate(
+    user: string,
+    password: string,
+    encoding: LS_SERVER_ENCODING
+  ): Promise<boolean>;
+
+  validate(): Promise<boolean>;
+
+  compile(options: Partial<ICompileOptions>): Promise<ICompileResult>;
+
+  sendRpoToken(rpoToken: IRpoToken): Promise<IRpoTokenResult>;
 
   // getRpoTokenFile(): string;
   // getServerType(): LS_SERVER_TYPE;

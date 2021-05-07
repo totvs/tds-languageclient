@@ -15,6 +15,7 @@
         "removeComments": true,
         "declaration": true,
         "sourceMap": true,
+        "resolveJsonModule": true,
         "declarationDir": "./typings",
         "outDir": "./lib",
         "lib": [
