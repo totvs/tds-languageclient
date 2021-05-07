@@ -2,7 +2,7 @@
   "name": "@totvs/tds-languageclient",
   "description": "TOTVS Language Client e Language Server Protocol",
   "displayName": "TOTVS Language Client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "TOTVS",
   "author": {
     "name": "TOTVS",
