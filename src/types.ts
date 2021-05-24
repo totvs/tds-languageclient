@@ -30,12 +30,24 @@ import {
 } from 'vscode-jsonrpc';
 import { LogLevel } from './logger';
 import {
+  IAppKillUserResult,
+  IApplyScope,
+  IApplyTemplateResult,
   ICompileExtraOptions,
   ICompileResult,
+  IDeleteProgramResult,
+  IInspectorObjectsResult,
+  IKillUserResult,
+  IPatchGenerateResult,
+  IPatchValidateResult,
   IReconnectOptions,
   IResponseStatus,
-  IRpoTokenResult,
-  LS_CONNECTION_TYPE,
+  IRpoChechIntegrityResult,
+  IRpoInfoResult,
+  ISendUserMessageResult,
+  ISetConnectionStatusResult,
+  IStopServerResult,
+  IWsdlGenerateResult,
   LS_SERVER_ENCODING,
 } from './protocolTypes';
 
@@ -140,6 +152,7 @@ export interface IMessageConnection extends MessageConnection {
 }
 
 export type BuildVersion =
+  | ''
   | '7.00.131227A'
   | '7.00.170117A'
   | '7.00.191205P'
@@ -150,10 +163,56 @@ export enum LS_ERROR {
   ERR_ALREADY_CONNECTED,
 }
 
-export enum LS_SERVER_TYPE {
+enum _LS_SERVER_TYPE {
+  UNDEFINED = 0,
   PROTHEUS = 1,
   LOGIX = 2,
   TOVSTECX = 3,
+}
+
+export namespace LSServerType {
+  export enum LS_SERVER_TYPE {
+    UNDEFINED = '',
+    PROTHEUS = 'totvs_server_protheus',
+    LOGIX = 'totvs_server_logix',
+    TOVSTECX = 'totvs_server_tecx',
+  }
+
+  export function fromString(value: string): _LS_SERVER_TYPE {
+    switch (value) {
+      case '':
+        return _LS_SERVER_TYPE.UNDEFINED;
+      case 'totvs_server_protheus':
+        return _LS_SERVER_TYPE.PROTHEUS;
+      case 'totvs_server_logix':
+        return _LS_SERVER_TYPE.LOGIX;
+      case 'totvs_server_tecx':
+        return _LS_SERVER_TYPE.TOVSTECX;
+      default:
+        throw Error(
+          'LSServerType.fromString called with invalid arqument. Argument: ' +
+            value
+        );
+    }
+  }
+
+  export function toString(value: _LS_SERVER_TYPE): LS_SERVER_TYPE {
+    switch (value) {
+      case _LS_SERVER_TYPE.UNDEFINED:
+        return LS_SERVER_TYPE.UNDEFINED;
+      case _LS_SERVER_TYPE.PROTHEUS:
+        return LS_SERVER_TYPE.PROTHEUS;
+      case _LS_SERVER_TYPE.LOGIX:
+        return LS_SERVER_TYPE.LOGIX;
+      case _LS_SERVER_TYPE.TOVSTECX:
+        return LS_SERVER_TYPE.TOVSTECX;
+      default:
+        throw Error(
+          'LSServerType.toString called with invalid arqument. Argument: ' +
+            value
+        );
+    }
+  }
 }
 
 export interface IRpoToken {
@@ -176,50 +235,122 @@ export interface IRpoToken {
 }
 
 export interface ICompileOptions {
-  authorizationToken: string;
   includesUris: string[];
   filesUris: string[];
   extensionsAllowed: string[];
-  extraOptions: ICompileExtraOptions;
+  extraOptions: Partial<ICompileExtraOptions>;
 }
 
-export interface ILSServer {
-  id: string;
-  serverName: string;
+export interface ILSServerAttributes {
+  readonly id: string;
+  name: string;
+  type: LSServerType.LS_SERVER_TYPE;
   connected: boolean;
   token: string;
-  serverType: LS_SERVER_TYPE;
+  authorizationToken: string;
   address: string;
   port: number;
   build: BuildVersion;
   secure: boolean;
   environment: string;
   lastError: IResponseStatus;
+}
 
-  getExtensionsAllowed(): string[];
+export const LS_ATTRIBUTES_DEFAULT: ILSServerAttributes = {
+  id: '',
+  name: '',
+  token: '',
+  type: LSServerType.LS_SERVER_TYPE.UNDEFINED,
+  address: '',
+  port: 0,
+  build: '',
+  secure: false,
+  environment: '',
+  connected: false,
+  authorizationToken: '',
+  lastError: undefined,
+};
 
-  connect(
-    connectionType: LS_CONNECTION_TYPE,
-    environment: string
-  ): Promise<boolean>;
-
+export interface ILSServerAbstract {
   disconnect(): Promise<string>;
 
   reconnect(options?: Partial<IReconnectOptions>): Promise<boolean>;
 
+  validate(): Promise<boolean>;
+
   authenticate(
+    environment: string,
     user: string,
     password: string,
     encoding: LS_SERVER_ENCODING
   ): Promise<boolean>;
+}
 
-  validate(): Promise<boolean>;
+export interface ILSServerMonitor {
+  connect(environment: string): Promise<boolean>;
+  setLockServer(lock: boolean): Thenable<ISetConnectionStatusResult>;
+  isLockServer(): Thenable<boolean>;
+  sendUserMessage(
+    recipient: string,
+    message: string
+  ): Thenable<ISendUserMessageResult>;
+  killConnection(target: any): Thenable<IKillUserResult>;
+  appKillConnection(target: any): Thenable<IAppKillUserResult>;
+  stop(): Thenable<IStopServerResult>;
+  killConnection(target: any): Thenable<IKillUserResult>;
+  appKillConnection(target: any): Thenable<IAppKillUserResult>;
+}
+
+export type IPatchApplyScope = 'none' | 'only_new' | 'all';
+
+export interface ILSServerDebugger {
+  connect(environment: string): Promise<boolean>;
 
   compile(options: Partial<ICompileOptions>): Promise<ICompileResult>;
 
-  sendRpoToken(rpoToken: IRpoToken): Promise<IRpoTokenResult>;
+  rpoCheckIntegrity(): Promise<IRpoChechIntegrityResult>;
 
-  // getRpoTokenFile(): string;
+  generateWsdl(
+    //authorizationToken: string,
+    url: string
+  ): Promise<IWsdlGenerateResult>;
+
+  applyTemplate(
+    includesUris: Array<string>,
+    templateUri: string
+  ): Promise<IApplyTemplateResult>;
+
+  deletePrograms(
+    //authorizationToken: string,
+    programs: string[]
+  ): Promise<IDeleteProgramResult>;
+
+  getRpoInfo(): Promise<IRpoInfoResult>;
+
+  patchValidate(patchURI: string): Promise<IPatchValidateResult>;
+
+  applyPatch(
+    patchURI: string,
+    applyScope: IApplyScope
+  ): Promise<IPatchValidateResult>;
+
+  inspectorObjects(includeTres: boolean): Promise<IInspectorObjectsResult>;
+
+  patchGenerate(
+    patchMaster: string,
+    patchDest: string,
+    patchType: number,
+    patchName: string,
+    filesPath: string[],
+    authorizationToken: string
+  ): Promise<IPatchGenerateResult>;
+
+  getPatchInfo(patchUri: string): any;
+
+  defragRpo(): any;
+
+  getExtensionsAllowed(): string[];
+
   // getServerType(): LS_SERVER_TYPE;
   // getAddress(): Url;
   // getBuild(): BuildVersion;
@@ -227,8 +358,6 @@ export interface ILSServer {
   // isSecure(): boolean;
   // isConnected(): boolean;
 
-  // setRpoToken(rpoToken: IRpoToken): this;
-  // setRpoTokenFile(rpoTokenFile: string): this;
   // setServerType(serverType: LS_SERVER_TYPE): this;
   // setAddress(address: Url): this;
   // setBuild(build: BuildVersion): this;
@@ -236,3 +365,7 @@ export interface ILSServer {
   // setSecure(secure: boolean): this;
   // setConnected(connected: boolean): this;
 }
+
+export declare type TLSServerAbstract = ILSServerAbstract & ILSServerAttributes;
+export declare type TLSServerMonitor = TLSServerAbstract & ILSServerMonitor;
+export declare type TLSServerDebugger = TLSServerAbstract & ILSServerDebugger;

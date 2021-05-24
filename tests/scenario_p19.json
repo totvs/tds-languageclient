@@ -1,0 +1,15 @@
+{
+  "server": {
+    "name": "P19",
+    "type": "totvs_server_protheus",
+    "address": "localhost",
+    "port": 19316,
+    "build": "7.00.191205P",
+    "secure": true
+  },
+  "environment": "p12",
+  "adminUser": {},
+  "noAdminUser": {},
+  "customKeys": {},
+  "autorizationToken": "018RUE032KUIK008000FF1282"
+}

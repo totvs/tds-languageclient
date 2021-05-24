@@ -17,30 +17,65 @@ import * as rpc from 'vscode-jsonrpc';
 import { EventEmitter } from 'events';
 import {
   ICompileOptions,
+  ILSServerAttributes,
   IMessageConnection,
-  IRpoToken,
-  ILSServer,
   IStartLSOptions,
+  LSServerType,
 } from './types';
 import {
+  IApplyTemplateInfo,
+  IApplyTemplateResult,
   IAuthenticationInfo,
   IAuthenticationResult,
   ICompileInfo,
   ICompileResult,
   IConnectionInfo,
   IConnectionResult,
+  IDeleteProgramInfo,
+  IDeleteProgramResult,
   IDisconnectionInfo,
   IDisconnectionResult,
   IReconnectInfo,
   IReconnectResult,
   IResponseStatus,
-  IRpoTokenResult,
+  IRpoChechIntegrityResult,
+  IRpoCheckIntegrityInfo,
+  IRpoInfoResult,
+  IRpoInfo,
   ITdsLanguageClient,
   IValidationInfo,
   IValidationResult,
+  IWsdlGenerateInfo,
+  IWsdlGenerateResult,
   LS_CONNECTION_TYPE,
   LS_MESSAGE_TYPE,
   LS_SERVER_ENCODING,
+  IPatchValidateInfo,
+  IPatchValidateResult,
+  IInspectorObjectsInfo,
+  IInspectorObjectsResult,
+  IPatchGenerateInfo,
+  IPatchGenerateResult,
+  IPatchInfo,
+  IPatchResult,
+  ISetConnectionStatusInfo,
+  ISetConnectionStatusResult,
+  IGetConnectionStatusResult,
+  IGetConnectionStatusInfo,
+  IApplyScope,
+  IPatchApplyInfo,
+  ISendUserMessageInfo,
+  ISendUserMessageResult,
+  IStopServerInfo,
+  IStopServerResult,
+  IKillUserResult,
+  IKillUserInfo,
+  IAppKillUserInfo,
+  IAppKillUserResult,
+  IGetUsersResult,
+  IGetUsersInfo,
+  IDefragRpoInfo,
+  IDefragRpoResult,
 } from './protocolTypes';
 
 import { ChildProcess, spawn } from 'child_process';
@@ -80,6 +115,7 @@ export function stopLanguageServer(): void {
   if (childProcess) {
     //childProcess.disconnect();
     childProcess.kill();
+    childProcess = undefined;
   }
   tdsLanguageClient = undefined;
 }
@@ -232,6 +268,10 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
     });
   }
 
+  get lsProcess(): ChildProcess {
+    return childProcess;
+  }
+
   public on(event: string, listener: (...args: any[]) => void): this {
     logger.debug('on %s', event, listener.name);
 
@@ -241,15 +281,15 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
   }
 
   public connect(
-    server: ILSServer,
+    server: ILSServerAttributes,
     connectionType: LS_CONNECTION_TYPE,
     environment: string
   ): Thenable<IConnectionResult> {
     const requestData: IConnectionInfo = {
       connType: connectionType,
       identification: server.id,
-      serverType: server.serverType,
-      serverName: server.serverName,
+      serverType: LSServerType.fromString(server.type),
+      serverName: server.name,
       server: server.address,
       port: server.port,
       bSecure: server.secure ? 1 : 0,
@@ -273,9 +313,11 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
       );
   }
 
-  public disconnect(server: ILSServer): Thenable<IDisconnectionResult> {
+  public disconnect(
+    server: ILSServerAttributes
+  ): Thenable<IDisconnectionResult> {
     const requestData: IDisconnectionInfo = {
-      serverName: server.serverName,
+      serverName: server.name,
       connectionToken: server.token,
     };
 
@@ -295,7 +337,8 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
   }
 
   public authenticate(
-    server: ILSServer,
+    server: ILSServerAttributes,
+    environment: string,
     user: string,
     password: string,
     encoding: LS_SERVER_ENCODING
@@ -304,7 +347,7 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
       connectionToken: server.token,
       user: user,
       password: password,
-      environment: server.environment,
+      environment: environment,
       encoding: encoding,
     };
 
@@ -324,12 +367,12 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
   }
 
   public reconnect(
-    serverItem: ILSServer,
+    serverItem: ILSServerAttributes,
     connectionToken: string,
     connType: LS_CONNECTION_TYPE
   ): Thenable<IReconnectResult> {
     const requestData: IReconnectInfo = {
-      serverName: serverItem.serverName,
+      serverName: serverItem.name,
       connectionToken: connectionToken,
       connType: connType,
     };
@@ -349,7 +392,7 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
       );
   }
 
-  public validation(server: ILSServer): Thenable<IValidationResult> {
+  public validation(server: ILSServerAttributes): Thenable<IValidationResult> {
     const requestData: IValidationInfo = {
       server: server.address,
       port: server.port,
@@ -365,19 +408,57 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
         },
         (err: rpc.ResponseError<IResponseStatus>) => {
           logger.error(err.message);
+
           return Promise.reject(err);
         }
       );
   }
 
-  public compile(server: ILSServer, options: ICompileOptions): Thenable<any> {
+  public rpoCheckIntegrity(
+    server: ILSServerAttributes
+  ): Thenable<IRpoChechIntegrityResult> {
+    const requestData: IRpoCheckIntegrityInfo = {
+      connectionToken: server.token,
+      environment: server.environment,
+    };
+
+    return this.connection
+      .sendRequest('$totvsserver/rpoCheckIntegrity', {
+        rpoCheckIntegrityInfo: requestData,
+      })
+      .then(
+        (response: IRpoChechIntegrityResult) => {
+          return response;
+        },
+        (err: rpc.ResponseError<IResponseStatus>) => {
+          logger.error(err.message);
+
+          return Promise.reject(err);
+        }
+      );
+  }
+
+  public compile(
+    server: ILSServerAttributes,
+    options: ICompileOptions
+  ): Thenable<any> {
     const requestData: ICompileInfo = {
       connectionToken: server.token,
       environment: server.environment,
-      authorizationToken: options.authorizationToken,
+      authorizationToken: server.authorizationToken,
       includeUris: options.includesUris,
       fileUris: options.filesUris,
-      compileOptions: options.extraOptions,
+      compileOptions: {
+        recompile: false,
+        debugAphInfo: false,
+        gradualSending: false,
+        generatePpoFile: false,
+        showPreCompiler: false,
+        priorVelocity: false,
+        returnPpo: false,
+        commitWithErrorOrWarning: false,
+        ...options.extraOptions,
+      },
       extensionsAllowed: options.extensionsAllowed,
     };
 
@@ -390,36 +471,455 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
           return result;
         },
         (error: rpc.ResponseError<IResponseStatus>) => {
-          logger.log(error);
+          logger.error(error);
           return Promise.reject(error);
         }
       );
   }
 
-  public sendRpoToken(
-    server: ILSServer,
-    rpoToken: IRpoToken
-  ): Thenable<IRpoTokenResult> {
+  generateWsdl(
+    server: ILSServerAttributes,
+    url: string
+  ): Thenable<IWsdlGenerateResult> {
+    const requestData: IWsdlGenerateInfo = {
+      connectionToken: server.token,
+      authorizationToken: server.authorizationToken,
+      environment: server.environment,
+      wsdlUrl: url,
+    };
+
     return this.connection
-      .sendRequest('$totvsserver/rpoToken', {
-        rpoToken: {
-          connectionToken: server.token,
-          environment: server.environment,
-          file: rpoToken.file,
-          content: rpoToken.token,
-        },
+      .sendRequest('$totvsserver/wsdlGenerate', {
+        wsdlGenerateInfo: requestData,
       })
       .then(
-        (response: IRpoTokenResult) => {
-          if (!response.sucess) {
-            logger.log(response.message);
-          }
-
+        (response: IWsdlGenerateResult) => {
           return response;
         },
         (err: rpc.ResponseError<IResponseStatus>) => {
-          logger.log(err);
+          logger.error(err);
+
           return Promise.reject(err);
+        }
+      );
+  }
+
+  applyTemplate(
+    server: ILSServerAttributes,
+    includesUris: Array<string>,
+    templateUri: string
+  ): Thenable<IApplyTemplateResult> {
+    const requestData: IApplyTemplateInfo = {
+      connectionToken: server.token,
+      authorizationToken: server.authorizationToken,
+      environment: server.environment,
+      includeUris: includesUris,
+      templateUri: templateUri,
+      isLocal: true,
+    };
+
+    return this.connection
+      .sendRequest('$totvsserver/templateApply', {
+        templateApplyInfo: requestData,
+      })
+      .then(
+        (response: IApplyTemplateResult) => {
+          if (response.error) {
+            return Promise.reject(response);
+          }
+
+          return Promise.resolve(response);
+        },
+        (err: rpc.ResponseError<IResponseStatus>) => {
+          const error: IApplyTemplateResult = {
+            error: true,
+            message: err.message,
+            errorCode: err.code,
+          };
+
+          logger.error(error);
+          return Promise.reject(error);
+        }
+      );
+  }
+
+  deleteProgram(server: ILSServerAttributes, programs: string[]): any {
+    const requestData: IDeleteProgramInfo = {
+      connectionToken: server.token,
+      authorizationToken: server.authorizationToken,
+      environment: server.environment,
+      programs: programs,
+    };
+
+    return this.connection
+      .sendRequest('$totvsserver/deletePrograms', {
+        deleteProgramsInfo: requestData,
+      })
+      .then(
+        (response: IDeleteProgramResult) => {
+          return response;
+        },
+        (err: rpc.ResponseError<IResponseStatus>) => {
+          logger.error(err);
+
+          return Promise.reject(err);
+        }
+      );
+  }
+
+  getRpoInfo(server: ILSServerAttributes): any {
+    const requestData: IRpoInfo = {
+      connectionToken: server.token,
+      environment: server.environment,
+    };
+
+    return this.connection
+      .sendRequest('$totvsserver/rpoInfo', {
+        rpoInfo: requestData,
+      })
+      .then(
+        (rpoInfo: IRpoInfoResult) => {
+          return rpoInfo;
+        },
+        (err: rpc.ResponseError<IResponseStatus>) => {
+          logger.error(err);
+
+          return Promise.reject(err);
+        }
+      );
+  }
+
+  patchValidate(server: ILSServerAttributes, patchURI: string): any {
+    const requestData: IPatchValidateInfo = {
+      connectionToken: server.token,
+      authorizationToken: server.authorizationToken,
+      environment: server.environment,
+      patchUri: patchURI,
+      isLocal: true,
+    };
+
+    return this.connection
+      .sendRequest('$totvsserver/patchValidate', {
+        patchValidateInfo: requestData,
+      })
+      .then(
+        (result: IPatchValidateResult) => {
+          return result;
+        },
+        (err: rpc.ResponseError<IResponseStatus>) => {
+          logger.error(err);
+
+          return Promise.reject(err);
+        }
+      );
+  }
+
+  applyPatch(
+    server: ILSServerAttributes,
+    patchURI: string,
+    applyScope: IApplyScope
+  ): Thenable<IPatchValidateResult> {
+    const requestData: IPatchApplyInfo = {
+      connectionToken: server.token,
+      authenticateToken: server.authorizationToken,
+      environment: server.environment,
+      patchUri: patchURI,
+      isLocal: true,
+      applyScope: applyScope,
+      isValidOnly: false,
+    };
+
+    return this.connection
+      .sendRequest('$totvsserver/patchApply', {
+        patchValidateInfo: requestData,
+      })
+      .then(
+        (result: IPatchValidateResult) => {
+          if (result.error) {
+            return Promise.reject(result);
+          }
+
+          return result;
+        },
+        (err: rpc.ResponseError<IResponseStatus>) => {
+          logger.error(err);
+
+          return Promise.reject(err);
+        }
+      );
+  }
+
+  inspectorObjects(server: ILSServerAttributes, includeTres: boolean): any {
+    const requestData: IInspectorObjectsInfo = {
+      connectionToken: server.token,
+      environment: server.environment,
+      includeTres: includeTres,
+    };
+
+    return this.connection
+      .sendRequest('$totvsserver/inspectorObjects', {
+        inspectorObjectsInfo: requestData,
+      })
+      .then(
+        (response: IInspectorObjectsResult) => {
+          return response;
+        },
+        (err: rpc.ResponseError<IResponseStatus>) => {
+          logger.error(err);
+
+          return Promise.reject(err);
+        }
+      );
+  }
+
+  patchGenerate(
+    server: ILSServerAttributes,
+    patchMaster: string,
+    patchDest: string,
+    patchType: number,
+    patchName: string,
+    filesPath: string[]
+  ): any {
+    const requestData: IPatchGenerateInfo = {
+      connectionToken: server.token,
+      authorizationToken: server.authorizationToken,
+      environment: server.environment,
+      patchMaster: patchMaster,
+      patchDest: patchDest,
+      isLocal: true,
+      patchType: patchType,
+      name: patchName,
+      patchFiles: filesPath,
+    };
+
+    return this.connection
+      .sendRequest('$totvsserver/patchGenerate', {
+        patchGenerateInfo: requestData,
+      })
+      .then(
+        (response: IPatchGenerateResult) => {
+          return response;
+        },
+        (err: rpc.ResponseError<IResponseStatus>) => {
+          logger.error(err);
+
+          return Promise.reject(err);
+        }
+      );
+  }
+
+  getPatchInfo(
+    server: ILSServerAttributes,
+    patchUri: string
+  ): Thenable<IPatchResult> {
+    const requestData: IPatchInfo = {
+      connectionToken: server.token,
+      authorizationToken: server.authorizationToken,
+      environment: server.environment,
+      patchUri: patchUri,
+      isLocal: true,
+    };
+
+    return this.connection
+      .sendRequest('$totvsserver/patchInfo', {
+        patchInfoInfo: requestData,
+      })
+      .then(
+        (response: IPatchResult) => {
+          return response;
+        },
+        (err: rpc.ResponseError<IResponseStatus>) => {
+          logger.error(err);
+
+          return Promise.reject(err);
+        }
+      );
+  }
+
+  setLockServer(
+    server: ILSServerAttributes,
+    lock: boolean
+  ): Thenable<ISetConnectionStatusResult> {
+    const requestData: ISetConnectionStatusInfo = {
+      connectionToken: server.token,
+      status: !lock,
+    };
+
+    return this.connection
+      .sendRequest('$totvsmonitor/setConnectionStatus', {
+        setConnectionStatusInfo: requestData,
+      })
+      .then(
+        (response: ISetConnectionStatusResult) => {
+          return response;
+        },
+        (err: rpc.ResponseError<IResponseStatus>) => {
+          logger.error(err);
+
+          return Promise.reject(err);
+        }
+      );
+  }
+
+  isLockServer(
+    server: ILSServerAttributes
+  ): Thenable<IGetConnectionStatusResult> {
+    const requestData: IGetConnectionStatusInfo = {
+      connectionToken: server.token,
+    };
+
+    return this.connection
+      .sendRequest('$totvsmonitor/getConnectionStatus', {
+        getConnectionStatusInfo: requestData,
+      })
+      .then(
+        (response: IGetConnectionStatusResult) => {
+          return response;
+        },
+        (err: rpc.ResponseError<IResponseStatus>) => {
+          logger.error(err);
+
+          return Promise.reject(err);
+        }
+      );
+  }
+
+  sendUserMessage(
+    server: ILSServerAttributes,
+    target: any,
+    message: string
+  ): Promise<ISendUserMessageResult> {
+    const requestData: ISendUserMessageInfo = {
+      connectionToken: server.token,
+      userName: target.username,
+      computerName: target.computerName,
+      threadId: target.threadId,
+      server: target.server,
+      environment: target.environment,
+      message: message,
+    };
+
+    return this.connection
+      .sendRequest('$totvsmonitor/sendUserMessage', {
+        sendUserMessageInfo: requestData,
+      })
+      .then(
+        (result: ISendUserMessageResult) => result,
+        (error: rpc.ResponseError<IResponseStatus>) => {
+          logger.error(error);
+
+          return Promise.reject(error);
+        }
+      );
+  }
+
+  stopServer(server: ILSServerAttributes): Thenable<IStopServerResult> {
+    const requestData: IStopServerInfo = {
+      connectionToken: server.token,
+    };
+
+    return this.connection
+      .sendRequest('$totvsserver/stopServer', {
+        stopServerInfo: requestData,
+      })
+      .then(
+        (response: IStopServerResult) => {
+          return response;
+        },
+        (error: Error) => {
+          return error;
+        }
+      );
+  }
+
+  killConnection(
+    server: ILSServerAttributes,
+    target: any
+  ): Thenable<IKillUserResult> {
+    const requestData: IKillUserInfo = {
+      connectionToken: server.token,
+      userName: target.username,
+      computerName: target.computerName,
+      threadId: target.threadId,
+      serverName: target.server,
+    };
+
+    return this.connection
+      .sendRequest('$totvsmonitor/killUser', {
+        killUserInfo: requestData,
+      })
+      .then(
+        (response: any) => {
+          return response.message;
+        },
+        (error: Error) => {
+          return error.message;
+        }
+      );
+  }
+
+  appKillConnection(
+    server: ILSServerAttributes,
+    target: any
+  ): Thenable<IAppKillUserResult> {
+    const requestData: IAppKillUserInfo = {
+      connectionToken: server.token,
+      userName: target.username,
+      computerName: target.computerName,
+      threadId: target.threadId,
+      serverName: target.server,
+    };
+
+    return this.connection
+      .sendRequest('$totvsmonitor/appKillUser', {
+        killUserInfo: requestData,
+      })
+      .then(
+        (response: any) => {
+          return response.message;
+        },
+        (error: Error) => {
+          return error.message;
+        }
+      );
+  }
+
+  getUsers(server: ILSServerAttributes): any {
+    const requestData: IGetUsersInfo = {
+      connectionToken: server.token,
+    };
+
+    return this.connection
+      .sendRequest('$totvsmonitor/getUsers', {
+        killUserInfo: requestData,
+      })
+      .then(
+        (response: IGetUsersResult) => {
+          return response;
+        },
+        (error: Error) => {
+          return error.message;
+        }
+      );
+  }
+
+  defragRpo(server: ILSServerAttributes): any {
+    const requestData: IDefragRpoInfo = {
+      connectionToken: server.token,
+      environment: server.environment,
+      packPatchInfo: true,
+    };
+
+    return this.connection
+      .sendRequest('$totvsserver/defragRpo', {
+        defragRpoInfo: requestData,
+      })
+      .then(
+        (response: IDefragRpoResult) => {
+          return response;
+        },
+        (error: Error) => {
+          return error.message;
         }
       );
   }

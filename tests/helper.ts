@@ -13,83 +13,66 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { LS_CONNECTION_TYPE, LS_SERVER_ENCODING } from '../src/protocolTypes';
-import { LSServerInformation } from '../src/server';
-import { ILSServer, LS_SERVER_TYPE } from '../src/types';
+import { configVO, IUserVO, startLSOptions } from './scenario';
+import {
+  startLanguageServer,
+  stopLanguageServer,
+  TLSServerDebugger,
+  TLSServerMonitor,
+} from '../src';
 
-export interface IUserVO {
-  username: string;
-  password: string;
-  encondig?: LS_SERVER_ENCODING;
+// export function startServer(
+//   idLogger: string,
+//   appServerBin: string
+// ): ChildProcessWithoutNullStreams {
+//   //const logger: ILogger = getLogger(idLogger);
+
+//   const spawnArgs = ['-console'];
+//   const spawnOptions = {
+//     env: process.env,
+//   };
+
+//   const childProcess = spawn(appServerBin, spawnArgs, spawnOptions);
+
+//   return childProcess;
+// }
+
+export async function doStartLanguageServer() {
+  startLanguageServer(startLSOptions);
 }
 
-export const serverP20: ILSServer = new LSServerInformation({
-  id: 'XXXXXX',
-  serverName: 'p20',
-  serverType: LS_SERVER_TYPE.PROTHEUS,
-  address: 'localhost',
-  port: 2030,
-  build: '7.00.210324P',
-});
-
-export const invalidUser: IUserVO = {
-  username: 'NOT_EXIST_USER',
-  password: 'XXXXXXX',
-};
-
-export const adminUser: IUserVO = {
-  username: 'admin',
-  password: '1234',
-};
-
-export const noAdminUser: IUserVO = {
-  username: 'USERORIGEM',
-  password: '1234',
-};
-
-export function startServer(
-  idLogger: string,
-  appServerBin: string
-): ChildProcessWithoutNullStreams {
-  //const logger: ILogger = getLogger(idLogger);
-
-  const spawnArgs = ['-console'];
-  const spawnOptions = {
-    env: process.env,
-  };
-
-  const childProcess = spawn(appServerBin, spawnArgs, spawnOptions);
-
-  return childProcess;
+export async function doStopLanguageServer() {
+  stopLanguageServer();
 }
 
 export async function doConnect(
-  server: ILSServer,
-  environment: string,
-  type?: LS_CONNECTION_TYPE
+  server: TLSServerDebugger | TLSServerMonitor,
+  environment: string
 ): Promise<boolean> {
   return await new Promise<boolean>((resolve) => {
-    resolve(server.connect(type || LS_CONNECTION_TYPE.Debugger, environment));
+    resolve(server.connect(environment));
   });
 }
 
-export async function doDisconnect(server: ILSServer): Promise<string> {
+export async function doDisconnect(
+  server: TLSServerDebugger | TLSServerMonitor
+): Promise<string> {
   return await new Promise<string>((resolve) => {
     resolve(server.disconnect());
   });
 }
 
 export async function doAuthenticate(
-  server: ILSServer,
+  server: TLSServerDebugger | TLSServerMonitor,
   user: IUserVO
 ): Promise<boolean> {
   return await new Promise<boolean>((resolve) => {
     resolve(
       server.authenticate(
+        server.environment,
         user.username,
         user.password,
-        user.encondig || LS_SERVER_ENCODING.CP1251
+        configVO.encondig
       )
     );
   });

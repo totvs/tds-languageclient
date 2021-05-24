@@ -36,37 +36,51 @@ const noRpoToken: IRpoToken = {
 };
 
 export function getRpoTokenFromFile(path: string): IRpoToken {
-  const result: IRpoToken = noRpoToken;
+  let result: IRpoToken = noRpoToken;
 
   if (path) {
     try {
       const buffer: Buffer = fs.readFileSync(path);
       const token: string = buffer.toString();
-      const content: string = Buffer.from(token, 'base64').toString('ascii');
-      const header: string = content.substring(
-        content.indexOf('{'),
-        content.indexOf('}') + 1
-      );
-      let body: string = content.substring(header.length);
-      body = content.substring(
-        header.length,
-        header.length + body.indexOf('}') + 1
-      );
 
-      const headerJson: any = JSON.parse(header);
-      const bodyJson: any = JSON.parse(body);
-
+      result = getRpoTokenFromString(token);
       result.file = path;
-      result.token = token;
-      result.header = headerJson;
-      result.body = {
-        ...bodyJson,
-        exp: new Date(bodyJson.exp),
-        iat: new Date(bodyJson.iat),
-      };
     } catch (error) {
       result.error = error.message;
     }
+  }
+
+  return result;
+}
+
+export function getRpoTokenFromString(token: string): IRpoToken {
+  const result: IRpoToken = noRpoToken;
+
+  try {
+    const content: string = Buffer.from(token, 'base64').toString('ascii');
+
+    const header: string = content.substring(
+      content.indexOf('{'),
+      content.indexOf('}') + 1
+    );
+    let body: string = content.substring(header.length);
+    body = content.substring(
+      header.length,
+      header.length + body.indexOf('}') + 1
+    );
+
+    const headerJson: any = JSON.parse(header);
+    const bodyJson: any = JSON.parse(body);
+
+    result.token = content;
+    result.header = headerJson;
+    result.body = {
+      ...bodyJson,
+      exp: new Date(bodyJson.exp),
+      iat: new Date(bodyJson.iat),
+    };
+  } catch (error) {
+    result.error = error.message;
   }
 
   return result;

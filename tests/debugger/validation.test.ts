@@ -13,24 +13,34 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { startLanguageServer, stopLanguageServer } from '../src/languageClient';
-import { LS_CONNECTION_TYPE } from '../src/protocolTypes';
-import { ILSServer } from '../src/types';
-import { serverP20 } from './helper';
+import { TLSServerDebugger } from '../../src/types';
+import {
+  doConnect,
+  doDisconnect,
+  doStartLanguageServer,
+  doStopLanguageServer,
+} from '../helper';
+import { server } from '../scenario';
 
 beforeAll(() => {
-  startLanguageServer();
+  doStartLanguageServer();
 });
 
 afterAll(() => {
-  stopLanguageServer();
+  doStopLanguageServer();
 });
 
-it('conexão', () => {
-  const server: ILSServer = serverP20;
+beforeEach(async () => {
+  await doConnect(server, server.environment);
+});
 
+afterEach(() => {
+  async () => doDisconnect(server);
+});
+
+it('validação (validate/validation)', () => {
   return server
-    .connect(LS_CONNECTION_TYPE.Debugger, 'p12')
+    .validate()
     .then(
       (value: boolean) => {
         expect(value).toBeTruthy();
@@ -38,16 +48,11 @@ it('conexão', () => {
         return server;
       },
       (err: any) => {
-        console.log(err);
+        expect(err).toBeNull();
       }
     )
-    .then((value: ILSServer) => {
-      expect(value.connected).toBeTruthy();
-      expect(value.token).not.toBeNull();
-
-      return value.disconnect();
-    })
-    .then((message: string) => {
-      expect(message).toEqual('Success');
+    .then((value: TLSServerDebugger) => {
+      expect(value.build).toMatch(/7\.00\.210324P|7\.00\.191205P/);
+      expect(value.secure).toBeTruthy();
     });
 });

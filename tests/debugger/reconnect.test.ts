@@ -13,31 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { startLanguageServer, stopLanguageServer } from '../src/languageClient';
-import { ILSServer } from '../src/types';
+import { TLSServerDebugger } from '../../src/types';
 import {
-  adminUser,
   doAuthenticate,
   doConnect,
   doDisconnect,
-  IUserVO,
-  serverP20,
-} from './helper';
+  doStartLanguageServer,
+  doStopLanguageServer,
+} from '../helper';
+import { adminUser, server } from '../scenario';
 
 beforeAll(() => {
-  startLanguageServer();
+  doStartLanguageServer();
 });
 
 afterAll(() => {
-  stopLanguageServer();
+  doStopLanguageServer();
 });
 
-const server: ILSServer = serverP20;
-const user: IUserVO = adminUser;
-
 beforeEach(async () => {
-  await doConnect(server, 'p12');
-  await doAuthenticate(server, user);
+  await doConnect(server, server.environment);
+  await doAuthenticate(server, adminUser);
 });
 
 afterEach(() => {
@@ -61,7 +57,7 @@ it('reconexão com token inválido', () => {
         expect(err).toBeNull();
       }
     )
-    .then((value: ILSServer) => {
+    .then((value: TLSServerDebugger) => {
       expect(value.connected).toBeTruthy();
       expect(value.token).not.toBeNull();
     });
@@ -88,7 +84,7 @@ it('reconexão', () => {
         return server;
       }
     )
-    .then((value: ILSServer) => {
+    .then((value: TLSServerDebugger) => {
       expect(value.connected).toBeFalsy();
     });
 });

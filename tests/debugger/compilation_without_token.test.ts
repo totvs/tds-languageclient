@@ -14,32 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import path from 'path';
-import { startLanguageServer, stopLanguageServer } from '../src/languageClient';
-import { ICompileResult, IFileCompileResult } from '../src/protocolTypes';
-import { ICompileOptions, ILSServer } from '../src/types';
+import { ICompileResult, IFileCompileResult } from '../../src/protocolTypes';
+import { ICompileOptions } from '../../src/types';
 import {
-  adminUser,
   doAuthenticate,
   doConnect,
   doDisconnect,
-  IUserVO,
-  serverP20,
-} from './helper';
+  doStartLanguageServer,
+  doStopLanguageServer,
+} from '../helper';
+import { adminUser, server } from '../scenario';
 
 beforeAll(() => {
-  startLanguageServer();
+  doStartLanguageServer();
 });
 
 afterAll(() => {
-  stopLanguageServer();
+  doStopLanguageServer();
 });
 
-const server: ILSServer = serverP20;
-const user: IUserVO = adminUser;
-
 beforeEach(async () => {
-  await doConnect(server, 'p12');
-  await doAuthenticate(server, user);
+  await doConnect(server, server.environment);
+  await doAuthenticate(server, adminUser);
+
+  server.authorizationToken = '';
 });
 
 afterEach(() => {

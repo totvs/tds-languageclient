@@ -29,34 +29,6 @@ export function sendGetUsersRequest(server: ServerItem): Thenable<any> {
     );
 }
 
-export function sendLockServer(
-  server: ServerItem,
-  lock: boolean
-): Thenable<boolean> {
-  return languageClient
-    .sendRequest('$totvsmonitor/setConnectionStatus', {
-      setConnectionStatusInfo: {
-        connectionToken: server.token,
-        status: !lock, //false: conexões bloqueadas
-      },
-    })
-    .then((response: any) => {
-      return response.message === 'OK';
-    });
-}
-
-export function sendIsLockServer(server: ServerItem): Thenable<boolean> {
-  return languageClient
-    .sendRequest('$totvsmonitor/getConnectionStatus', {
-      getConnectionStatusInfo: {
-        connectionToken: server.token,
-      },
-    })
-    .then((response: any) => {
-      return !response.status; //false: conexões bloqueadas
-    });
-}
-
 export function sendKillConnection(
   server: ServerItem,
   target: any
@@ -246,37 +218,6 @@ export function sendValidPatchRequest(
     );
 }
 
-export function sendPatchInfo(
-  server: ServerItem,
-  permissions,
-  patchUri: string
-): Thenable<any> {
-  if (_debugEvent) {
-    vscode.window.showWarningMessage(
-      'Esta operação não é permitida durante uma depuração.'
-    );
-    return Promise.resolve();
-  }
-
-  return languageClient
-    .sendRequest('$totvsserver/patchInfo', {
-      patchInfoInfo: {
-        connectionToken: server.token,
-        authorizationToken: permissions.authorizationToken,
-        environment: server.environment,
-        patchUri: patchUri,
-        isLocal: true,
-      },
-    })
-    .then(
-      (response: any) => {
-        return response.patchInfos;
-      },
-      (err: ResponseError<object>) => {
-        vscode.window.showErrorMessage(err.message);
-      }
-    );
-}
 
 export interface IApplyTemplateResult {
   error: boolean;
@@ -318,35 +259,4 @@ export function sendApplyTemplateRequest(
     );
 }
 
-interface IRpoTokenResult {
-  sucess: boolean;
-  message: string;
-}
-
-export function sendRpoToken(
-  server: ServerItem,
-  rpoToken: IRpoToken
-): Thenable<IRpoTokenResult> {
-  if (rpoToken.file === '') {
-    return Promise.resolve({ sucess: false, message: '' });
-  }
-
-  return languageClient
-    .sendRequest('$totvsserver/rpoToken', {
-      rpoToken: {
-        connectionToken: server.token,
-        environment: server.environment,
-        file: rpoToken.file,
-        content: rpoToken.token,
-      },
-    })
-    .then(
-      (response: IRpoTokenResult) => {
-        return response;
-      },
-      (err: ResponseError<object>) => {
-        return { sucess: false, message: err.message };
-      }
-    );
-}
 */
