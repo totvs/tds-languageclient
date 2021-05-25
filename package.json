@@ -2,6 +2,8 @@
   "name": "@totvs/tds-languageclient",
   "version": "0.0.34",
   "description": "TOTVS Language Client",
+  "author": "TOTVS S.A.",
+  "license": "Apache-2.0",
   "main": "./target/index.js",
   "types": "./target/index.d.ts",
   "files": [
@@ -11,17 +13,20 @@
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./target",
+    "---RELEASE---": "",
+    "release": "npx standard-version",
+    "tag": "git push --follow-tags",
+    "to_publish": "npm publish",
+    "prepublish": "npm run clean && npm run build",
+    "---MISC---": "",
     "link": "npm link",
     "lint": "eslint ./src/**",
-    "prepublish": "npm run clean && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/totvs/tds-languageclient.git"
   },
-  "author": "TOTVS S.A.",
-  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/totvs/tds-languageclient/issues"
   },
