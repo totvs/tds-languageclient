@@ -43,7 +43,7 @@
     "prebuild": "npm run clean",
     "---TEST---": "",
     "test": "jest --detectOpenHandles --unhandled-rejections=strict",
-    "test:p20": "npm run test -- --scenario=./tests/scenario_p20.json",
+    "test:p20-3-0-0-ts": "npm run test -- --scenario=./tests/scenario_p20-3-0-0-ts.json",
     "test:p19-3-1-6": "npm run test -- --scenario=./tests/scenario_p19-3-1-6.json",
     "test:p19-3-1-7": "npm run test -- --scenario=./tests/scenario_p19-3-1-7.json",
     "test:snapshot": "npm run test:p20 -- --updateSnapshot",
