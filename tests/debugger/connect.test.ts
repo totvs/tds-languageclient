@@ -15,15 +15,17 @@ limitations under the License.
 */
 import { TLSServerDebugger } from '../../src/types';
 import { doStartLanguageServer, doStopLanguageServer } from '../helper';
-import { configVO, server } from '../scenario';
+import { configVO, getServer} from '../scenario';
 
 beforeAll(() => {
   doStartLanguageServer();
-});
+} );
 
 afterAll(() => {
   doStopLanguageServer();
-});
+} );
+
+const server: TLSServerDebugger = getServer();
 
 it('conexão', () => {
   return server

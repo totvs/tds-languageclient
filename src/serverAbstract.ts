@@ -52,7 +52,7 @@ export class LSServerAbstract implements TLSServerAbstract {
 
   public constructor(id: string, options?: Partial<ILSServerAttributes>) {
     const fullOptions: any = {
-      ...LS_ATTRIBUTES_DEFAULT,
+      ...LS_ATTRIBUTES_DEFAULT(),
       ...options,
     };
 

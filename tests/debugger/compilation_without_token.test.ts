@@ -13,31 +13,31 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import path from 'path';
-import { ICompileResult, IFileCompileResult } from '../../src/protocolTypes';
-import { ICompileOptions } from '../../src/types';
+import { ICompileResult, IFileCompileResult, IResponseStatus } from '../../src/protocolTypes';
+import { ICompileOptions, TLSServerDebugger } from '../../src/types';
 import {
   doAuthenticate,
   doConnect,
   doDisconnect,
   doStartLanguageServer,
-  doStopLanguageServer,
+  doStopLanguageServer
 } from '../helper';
-import { adminUser, server } from '../scenario';
+import { adminUser, configVO, getServer} from '../scenario';
 
 beforeAll(() => {
   doStartLanguageServer();
-});
+} );
 
 afterAll(() => {
   doStopLanguageServer();
-});
+} );
+
+const server: TLSServerDebugger = getServer();
+server.authorizationToken = ''
 
 beforeEach(async () => {
   await doConnect(server, server.environment);
   await doAuthenticate(server, adminUser);
-
-  server.authorizationToken = '';
 });
 
 afterEach(() => {
@@ -53,7 +53,7 @@ it('compilação com atributos mínimos não informado', () => {
 
       return server;
     },
-    (err: any) => {
+    (err: IResponseStatus) => {
       expect(err.code).toEqual(40912);
       expect(err.message).toContain('File URIs');
     }
@@ -62,15 +62,15 @@ it('compilação com atributos mínimos não informado', () => {
 
 it('compilação com includeList inexistente (AdvPL)', () => {
   const options: Partial<ICompileOptions> = {
-    filesUris: [path.resolve('.', 'tests', 'assets', 'hello.prw')],
-    includesUris: [path.resolve('.', 'tests', 'assets', 'not_exist')],
+    filesUris: [configVO.getAssetFile('hello.prw')],
+    includesUris: [configVO.getAssetFile('not_exist')],
   };
 
   return server.compile(options).then(
     (value: ICompileResult) => {
       expect(value).toBeNull();
     },
-    (err: any) => {
+    (err: IResponseStatus) => {
       expect(err.code).toEqual(4091);
       expect(err.message).toContain('One or more include');
     }
@@ -79,29 +79,30 @@ it('compilação com includeList inexistente (AdvPL)', () => {
 
 it('compilação de fonte inexistente (AdvPL)', () => {
   const options: Partial<ICompileOptions> = {
-    filesUris: [path.resolve('.', 'tests', 'assets', 'not_exist.prw')],
-    includesUris: [path.resolve('.', 'tests', 'assets', 'includes')],
+    filesUris: [configVO.getAssetFile('not_exist.prw')],
+    includesUris: [configVO.getAssetFile('includes')],
   };
 
   return server.compile(options).then(
     (value: ICompileResult) => {
-      expect(value.returnCode).toEqual(-1);
-      expect(value.compileInfos.length).toEqual(options.filesUris.length);
+      expect(value).toBeNull();
+    },
+    (err: IResponseStatus) => {
+      expect(err.code).toEqual(4091);
+      expect(err.message).toContain('One or more file');
+      expect(err.data.length).toEqual(options.filesUris.length);
 
-      const fileResult: IFileCompileResult = value.compileInfos[0];
+      const fileResult: IFileCompileResult = err.data[0];
       expect(fileResult.status).toEqual('ERROR');
       expect(fileResult.message).toEqual('File not found');
-    },
-    (err: any) => {
-      expect(err).toBeNull();
     }
   );
 });
 
 it('compilação com parâmetros mínimos (AdvPL)', () => {
   const options: Partial<ICompileOptions> = {
-    filesUris: [path.resolve('.', 'tests', 'assets', 'hello.prw')],
-    includesUris: [path.resolve('.', 'tests', 'assets', 'includes')],
+    filesUris: [configVO.getAssetFile('hello.prw')],
+    includesUris: [configVO.getAssetFile('includes')],
   };
 
   return server.compile(options).then(
@@ -113,7 +114,7 @@ it('compilação com parâmetros mínimos (AdvPL)', () => {
       expect(fileResult.status).toMatch(/SUCCESS|SKIPPED/i);
       expect(fileResult.detail).toEqual('');
     },
-    (err: any) => {
+    (err: IResponseStatus) => {
       expect(err).toBeNull();
     }
   );
@@ -121,21 +122,22 @@ it('compilação com parâmetros mínimos (AdvPL)', () => {
 
 it('compilação de fonte com erro de sixtaxe (AdvPL)', () => {
   const options: Partial<ICompileOptions> = {
-    filesUris: [path.resolve('.', 'tests', 'assets', 'hello_sintax_error.prw')],
-    includesUris: [path.resolve('.', 'tests', 'assets', 'includes')],
+    filesUris: [configVO.getAssetFile('hello_sintax_error.prw')],
+    includesUris: [configVO.getAssetFile('includes')],
   };
 
   return server.compile(options).then(
     (value: ICompileResult) => {
-      expect(value.returnCode).toEqual(-1);
-      expect(value.compileInfos.length).toEqual(options.filesUris.length);
+      expect(value).toBeNull();
+    },
+    (err: IResponseStatus) => {
+      expect(err.code).toEqual(4091);
+      expect(err.message).toContain('One or more files');
+      expect(err.data.length).toEqual(options.filesUris.length);
 
-      const fileResult: IFileCompileResult = value.compileInfos[0];
+      const fileResult: IFileCompileResult = err.data[0];
       expect(fileResult.status).toEqual('ERROR');
       expect(fileResult.detail).toContain('Statement unterminated');
-    },
-    (err: any) => {
-      expect(err).toBeNull();
     }
   );
 });

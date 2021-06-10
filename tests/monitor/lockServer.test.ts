@@ -13,24 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+import { TLSServerMonitor } from '../../src';
 import { ISetConnectionStatusResult } from '../../src/protocolTypes';
 import {
   doAuthenticate,
   doConnect,
   doDisconnect,
   doStartLanguageServer,
-  doStopLanguageServer,
+  doStopLanguageServer
 } from '../helper';
-import { adminUser, monitor } from '../scenario';
+import { adminUser, getMonitor } from '../scenario';
 
 beforeAll(() => {
   doStartLanguageServer();
-});
+} );
 
 afterAll(() => {
   doStopLanguageServer();
-});
+} );
 
+
+const monitor: TLSServerMonitor = getMonitor();
 beforeEach(async () => {
   await doConnect(monitor, monitor.environment);
   await doAuthenticate(monitor, adminUser);

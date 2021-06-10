@@ -13,8 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { configVO, IUserVO, startLSOptions } from './scenario';
+import { configVO, IUserVO } from './scenario';
 import {
+  LS_SERVER_ENCODING,
   startLanguageServer,
   stopLanguageServer,
   TLSServerDebugger,
@@ -38,7 +39,7 @@ import {
 // }
 
 export async function doStartLanguageServer() {
-  startLanguageServer(startLSOptions);
+  startLanguageServer(configVO.startLSOptions);
 }
 
 export async function doStopLanguageServer() {
@@ -72,7 +73,7 @@ export async function doAuthenticate(
         server.environment,
         user.username,
         user.password,
-        configVO.encondig
+        LS_SERVER_ENCODING.CP1252
       )
     );
   });

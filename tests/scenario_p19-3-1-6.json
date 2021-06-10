@@ -1,0 +1,16 @@
+{
+  "server": {
+    "name": "P19",
+    "type": "totvs_server_protheus",
+    "address": "localhost",
+    "port": 19316,
+    "build": "7.00.191205P",
+    "secure": true
+  },
+  "environment": "p12",
+  "adminUser": {},
+  "noAdminUser": {},
+  "customKeys": {},
+  "assetFolders": { "ptm": "p19" },
+  "authorizationToken": "OURBNC0yNkQxOjE2MTY2NDEyMDA6MTYyNDUwMzU5OTo6OjA6MTU=.shhvTzTPiYOB4pUNuWMZi5uTT5zd/hzZG3R96zp3BJgXxzWNVLEXOrAWBGE9v/lRbq5cHmPlQO84y/PG04oOOpGXo5VRWKTV04Xyu7E2EfnK3mBfRvlEKA/dbuN/U2+EHQAapEMNsCjTaVvVjFtpQZ4Er6kShU4VPMW6PmFpE3QEujqP1iL4ToNNS1Hkq8DPEzORQEvPSF9mE588zuY/Gh26C7si2G60Nfn639BU5bGH0rnGZAhT3cVoTEvF61QdJ/OzHfR9FYCOHOZTMw3LQ+kvIRz5X+WHgErld8iMLFwR4Uhndn2B4LH3gmgtusQlCCsbFgfJMLASQH/DTI7MoA=="
+}

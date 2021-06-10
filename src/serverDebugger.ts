@@ -90,7 +90,6 @@ export class LSServerDebugger
   }
 
   generateWsdl(
-    //authorizationToken: string,
     url: string
   ): Promise<IWsdlGenerateResult> {
     return this.connection.generateWsdl(this, url).then(
@@ -195,12 +194,10 @@ export class LSServerDebugger
     patchType: number,
     patchName: string,
     filesPath: string[]
-    //authorizationToken: string
   ): Promise<IPatchGenerateResult> {
     return this.connection
       .patchGenerate(
         this,
-        //authorizationToken,
         patchMaster,
         patchDest,
         patchType,

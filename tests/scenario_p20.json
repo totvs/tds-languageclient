@@ -16,5 +16,6 @@
     "trace": "verbose",
     "verbose": "verbose"
   },
+  "assetFolders": { "ptm": "p20" },
   "autorizationToken": "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjoiZGV2ZWxvcG1lbnQiLCJleHAiOjE2MjU3NjY0MDgsImlhdCI6MTYxNzk5MDQwOCwiaXNzIjoiVE9UVlMgUy5BIiwic3ViIjoidGVzdGUifQ.kzU2hLO9iLhe8s1MWrEHLvwOLuTMeUZdfI_rEHdKcbtTyrpMbXv9okpq7_vQz_hdyCwkbId3MP99e6CN6cig7Dv9RKhAD1h_9AjurutKQJQ4pSCc1eMDQWxmv70w0mtbW2Uy0S_BbWgp-XcExsZyAmgoJar-FOd-TMmSPxcy97013nucKzXxE3FBbjf7i0gz1jn6lDXg_1a-QbHdG34Xo9-NgTo5Njg-i_ZNfqUSzwCoBbJgZjDk-Jlif5yq6XRShfm3o3kYQhmzJ4MusKeQpNoTw3yxZFwJ3cW1QVhg7jc68yL9eMUnL9iV4xFCG5YnOslmsULwQSRlr9g3g09ehA"
 }

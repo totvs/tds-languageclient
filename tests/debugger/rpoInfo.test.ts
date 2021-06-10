@@ -13,24 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+import { TLSServerDebugger } from '../../src';
 import { IRpoInfoResult } from '../../src/protocolTypes';
 import {
   doAuthenticate,
   doConnect,
   doDisconnect,
   doStartLanguageServer,
-  doStopLanguageServer,
+  doStopLanguageServer
 } from '../helper';
-import { adminUser, server } from '../scenario';
+import { adminUser, getServer} from '../scenario';
 
 beforeAll(() => {
   doStartLanguageServer();
-});
+} );
 
 afterAll(() => {
   doStopLanguageServer();
-});
+} );
 
+const server: TLSServerDebugger = getServer();
 beforeEach(async () => {
   await doConnect(server, server.environment);
   await doAuthenticate(server, adminUser);

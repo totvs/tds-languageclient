@@ -28,6 +28,9 @@ export { startLanguageServer, stopLanguageServer } from './languageClient';
 export {
   PATCH_ERROR_CODE,
   LS_SERVER_ENCODING,
+  LS_CONNECTION_TYPE,
+  LS_ERROR_CODES,
+  LS_MESSAGE_TYPE,
   IReconnectOptions,
   ITdsLanguageClient,
   IStopServerResult,
@@ -37,7 +40,6 @@ export {
   IResponseStatus,
   ICompileResult,
   IRpoChechIntegrityResult,
-  LS_CONNECTION_TYPE,
   IApplyTemplateResult,
   IDeleteProgramResult,
   IPatchGenerateResult,

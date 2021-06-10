@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { ChildProcess } from 'node:child_process';
+import { ChildProcess } from 'child_process';
 import { ICompileOptions, ILSServerAttributes } from './types';
 
 export enum LS_CONNECTION_TYPE {

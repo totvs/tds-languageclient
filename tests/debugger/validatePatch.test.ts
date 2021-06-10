@@ -14,24 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import path from 'path';
+import { TLSServerDebugger } from '../../src';
 import { IPatchValidateResult } from '../../src/protocolTypes';
 import {
   doAuthenticate,
   doConnect,
   doDisconnect,
   doStartLanguageServer,
-  doStopLanguageServer,
+  doStopLanguageServer
 } from '../helper';
-import { adminUser, server } from '../scenario';
+import { adminUser, configVO, getServer} from '../scenario';
 
 beforeAll(() => {
   doStartLanguageServer();
-});
+} );
 
 afterAll(() => {
   doStopLanguageServer();
-});
+} );
 
+const server: TLSServerDebugger = getServer();
 beforeEach(async () => {
   await doConnect(server, server.environment);
   await doAuthenticate(server, adminUser);
@@ -42,7 +44,7 @@ afterEach(() => {
 });
 
 it.skip('patch válido', () => {
-  const patchUri: string = path.resolve('.', 'tests', 'assets', 'patch_ok.ptm');
+  const patchUri: string = configVO.getAssetFile('patch_ok.ptm');
 
   return server.patchValidate(patchUri).then(
     (value: IPatchValidateResult) => {

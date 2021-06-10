@@ -15,23 +15,25 @@ limitations under the License.
 */
 import path from 'path';
 import { IWsdlGenerateResult } from '../../src/protocolTypes';
+import { TLSServerDebugger } from '../../src/types';
 import {
   doAuthenticate,
   doConnect,
   doDisconnect,
   doStartLanguageServer,
-  doStopLanguageServer,
+  doStopLanguageServer
 } from '../helper';
-import { adminUser, server } from '../scenario';
+import { adminUser, getServer} from '../scenario';
 
 beforeAll(() => {
   doStartLanguageServer();
-});
+} );
 
 afterAll(() => {
   doStopLanguageServer();
-});
+} );
 
+const server: TLSServerDebugger = getServer();
 beforeEach(async () => {
   await doConnect(server, server.environment);
   await doAuthenticate(server, adminUser);

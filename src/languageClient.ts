@@ -471,8 +471,16 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
           return result;
         },
         (error: rpc.ResponseError<IResponseStatus>) => {
-          logger.error(error);
-          return Promise.reject(error);
+          const err:IResponseStatus = error as unknown as IResponseStatus;
+
+          logger.error(err);
+          if (err.data != undefined) {
+            const data: [] = JSON.parse(err.data.data);
+            
+            err.data = data.slice(0, -1);
+          }
+
+          return Promise.reject(err);
         }
       );
   }

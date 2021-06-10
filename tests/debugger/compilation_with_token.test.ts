@@ -13,25 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import path from 'path';
 import { ICompileResult, IFileCompileResult } from '../../src/protocolTypes';
-import { ICompileOptions } from '../../src/types';
+import { ICompileOptions, TLSServerDebugger } from '../../src/types';
 import {
   doAuthenticate,
   doConnect,
   doDisconnect,
   doStartLanguageServer,
-  doStopLanguageServer,
+  doStopLanguageServer
 } from '../helper';
-import { adminUser, server } from '../scenario';
+import { adminUser, configVO, getServer} from '../scenario';
 
 beforeAll(() => {
   doStartLanguageServer();
-});
+} );
 
 afterAll(() => {
   doStopLanguageServer();
-});
+} );
+
+const server: TLSServerDebugger = getServer();
 
 beforeEach(async () => {
   await doConnect(server, server.environment);
@@ -39,13 +40,14 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
+
   async () => doDisconnect(server);
 });
 
 it('compilação de function com TOKEN (AdvPL)', () => {
   const options: Partial<ICompileOptions> = {
-    filesUris: [path.resolve('.', 'tests', 'assets', 'hello_function.prw')],
-    includesUris: [path.resolve('.', 'tests', 'assets', 'includes')],
+    filesUris: [configVO.getAssetFile('hello_function.prw')],
+    includesUris: [configVO.getAssetFile('includes')],
   };
 
   return server.compile(options).then(

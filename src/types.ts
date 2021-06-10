@@ -256,20 +256,22 @@ export interface ILSServerAttributes {
   lastError: IResponseStatus;
 }
 
-export const LS_ATTRIBUTES_DEFAULT: ILSServerAttributes = {
-  id: '',
-  name: '',
-  token: '',
-  type: LSServerType.LS_SERVER_TYPE.UNDEFINED,
-  address: '',
-  port: 0,
-  build: '',
-  secure: false,
-  environment: '',
-  connected: false,
-  authorizationToken: '',
-  lastError: undefined,
-};
+export function LS_ATTRIBUTES_DEFAULT(): ILSServerAttributes {
+  return {
+    id: '',
+    name: '',
+    token: '',
+    type: LSServerType.LS_SERVER_TYPE.UNDEFINED,
+    address: '',
+    port: 0,
+    build: '',
+    secure: false,
+    environment: '',
+    connected: false,
+    authorizationToken: '',
+    lastError: undefined,
+  };
+}
 
 export interface ILSServerAbstract {
   disconnect(): Promise<string>;

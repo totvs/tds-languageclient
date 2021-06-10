@@ -14,29 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { LS_SERVER_ENCODING } from '../../src/protocolTypes';
+import { TLSServerDebugger } from '../../src/types';
 import {
   doConnect,
   doDisconnect,
   doStartLanguageServer,
-  doStopLanguageServer,
+  doStopLanguageServer
 } from '../helper';
-//import { , doStartLanguageServer, doStopLanguageServer } from '../helper';
 import {
   adminUser,
+  getServer,
   invalidUser,
   IUserVO,
   noAdminUser,
-  server,
 } from '../scenario';
 
 beforeAll(() => {
   doStartLanguageServer();
-});
+} );
 
 afterAll(() => {
   doStopLanguageServer();
-});
+} );
 
+const server: TLSServerDebugger = getServer();
 beforeEach(async () => {
   await doConnect(server, server.environment);
 });

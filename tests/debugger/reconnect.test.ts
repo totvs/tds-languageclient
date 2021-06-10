@@ -19,18 +19,19 @@ import {
   doConnect,
   doDisconnect,
   doStartLanguageServer,
-  doStopLanguageServer,
+  doStopLanguageServer
 } from '../helper';
-import { adminUser, server } from '../scenario';
+import { adminUser, getServer} from '../scenario';
 
 beforeAll(() => {
   doStartLanguageServer();
-});
+} );
 
 afterAll(() => {
   doStopLanguageServer();
-});
+} );
 
+const server: TLSServerDebugger = getServer();
 beforeEach(async () => {
   await doConnect(server, server.environment);
   await doAuthenticate(server, adminUser);

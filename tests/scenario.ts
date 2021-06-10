@@ -42,7 +42,8 @@ export interface IUserVO {
 }
 
 export interface IConfigVO {
-  autorizationToken: any;
+  getAssetFile: Function;
+  authorizationToken: any;
   server: {
     name: string;
     type: LSServerType.LS_SERVER_TYPE;
@@ -57,9 +58,24 @@ export interface IConfigVO {
   noAdminUser: IUserVO;
   startLSOptions?: IStartLSOptions;
   customKeys?: any;
+  assetFolders?: any;
 }
 
 export const configVO: IConfigVO = JSON.parse(buffer.toString());
+if (!configVO.assetFolders) {
+  configVO.assetFolders = [];
+}
+configVO.getAssetFile = (file: string) => {
+  const ext: string = path.extname(file).substr(1).toLocaleLowerCase();
+
+  return path.resolve(
+    '.',
+    'tests',
+    'assets',
+    configVO.assetFolders[ext] || '',
+    file
+  );
+};
 
 export const invalidUser: IUserVO = {
   username: 'NOT_EXIST_USER',
@@ -78,28 +94,34 @@ export const noAdminUser: IUserVO = {
   ...configVO.noAdminUser,
 };
 
-export const server: TLSServerDebugger = new LSServerDebugger('XXXXXX', {
-  name: configVO.server.name,
-  type: configVO.server.type,
-  address: configVO.server.address,
-  port: configVO.server.port,
-  build: configVO.server.build,
-  secure: configVO.server.secure,
-});
+export function getServer(): TLSServerDebugger {
+  const server:  TLSServerDebugger = new LSServerDebugger('XXXXXX', {
+    name: configVO.server.name,
+    type: configVO.server.type,
+    address: configVO.server.address,
+    port: configVO.server.port,
+    build: configVO.server.build,
+    secure: configVO.server.secure,
+  });
+  server.environment = configVO.environment;
+  server.authorizationToken = configVO.authorizationToken;
 
-export const monitor: TLSServerMonitor = new LSServerMonitor('XXXXXX', {
-  name: configVO.server.name,
-  type: configVO.server.type,
-  address: configVO.server.address,
-  port: configVO.server.port,
-  build: configVO.server.build,
-  secure: configVO.server.secure,
-});
+  return server;
+}
+
+export function getMonitor(): TLSServerMonitor {
+  const monitor:  TLSServerMonitor = new LSServerMonitor('XXXXXX', {
+    name: configVO.server.name,
+    type: configVO.server.type,
+    address: configVO.server.address,
+    port: configVO.server.port,
+    build: configVO.server.build,
+    secure: configVO.server.secure,
+  });
+  monitor.environment = configVO.environment;
+  monitor.authorizationToken = configVO.authorizationToken;
+
+  return monitor;
+}
 
 export const startLSOptions: IStartLSOptions = { ...configVO.startLSOptions };
-
-server.environment = configVO.environment;
-server.authorizationToken = configVO.autorizationToken;
-
-monitor.environment = configVO.environment;
-monitor.authorizationToken = configVO.autorizationToken;
