@@ -15,8 +15,8 @@ limitations under the License.
 */
 import { configVO, IUserVO } from './scenario';
 import {
+  getTDSLanguageServer,
   LS_SERVER_ENCODING,
-  startLanguageServer,
   stopLanguageServer,
   TLSServerDebugger,
   TLSServerMonitor,
@@ -39,7 +39,7 @@ import {
 // }
 
 export async function doStartLanguageServer() {
-  startLanguageServer(configVO.startLSOptions);
+  getTDSLanguageServer(configVO.startLSOptions);
 }
 
 export async function doStopLanguageServer() {

@@ -24,7 +24,7 @@ export {
   ICompileOptions,
   ILSServerAttributes,
 } from './types';
-export { startLanguageServer, stopLanguageServer } from './languageClient';
+export { startLanguageServer, stopLanguageServer, getTDSLanguageServer } from './languageClient';
 export {
   PATCH_ERROR_CODE,
   LS_SERVER_ENCODING,

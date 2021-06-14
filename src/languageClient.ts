@@ -88,7 +88,17 @@ const logger: ILogger = getLogger();
 let childProcess: ChildProcess = null;
 export let tdsLanguageClient: TdsLanguageClient;
 
-export function startLanguageServer(
+export function getTDSLanguageServer(
+  startOptions?: Partial<IStartLSOptions>
+): TdsLanguageClient {
+  if (!tdsLanguageClient) {
+    tdsLanguageClient = startLanguageServer('_tds_lsp_', startOptions);
+  }
+
+  return tdsLanguageClient
+}
+
+export function startLanguageServer(instanceId: string,
   startOptions?: Partial<IStartLSOptions>
 ): TdsLanguageClient {
   if (!tdsLanguageClient) {
@@ -931,4 +941,10 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
         }
       );
   }
+
+  freshenIndex(): void {
+    this.connection
+      .sendRequest('$advpl/freshenIndex')
+  }
+
 }

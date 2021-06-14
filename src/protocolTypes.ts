@@ -212,6 +212,8 @@ export interface ITdsLanguageClient {
   getUsers(server: ILSServerAttributes): Thenable<IGetUsersResult>;
 
   defragRpo(server: ILSServerAttributes): Thenable<IDefragRpoResult>;
+
+  freshenIndex(): void;
 }
 
 export interface IConnectionInfo {
