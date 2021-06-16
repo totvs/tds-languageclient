@@ -1,6 +1,6 @@
 {
   "name": "@totvs/tds-languageclient",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "description": "TOTVS Language Client",
   "main": "./target/index.js",
   "types": "./target/index.d.ts",
@@ -11,9 +11,14 @@
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./target",
+    "---RELEASE---": "",
+    "release": "npx standard-version",
+    "tag": "git push --follow-tags",
+    "to_publish": "npm publish",
+    "prepublishOnly": "npm run clean && npm run build",
+    "---MISC---": "",
     "link": "npm link",
     "lint": "eslint ./src/**",
-    "prepublish": "npm run clean && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
