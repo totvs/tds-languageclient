@@ -1,9 +1,7 @@
 {
   "name": "@totvs/tds-languageclient",
-  "version": "0.0.34",
+  "version": "0.0.36",
   "description": "TOTVS Language Client",
-  "author": "TOTVS S.A.",
-  "license": "Apache-2.0",
   "main": "./target/index.js",
   "types": "./target/index.d.ts",
   "files": [
@@ -17,7 +15,7 @@
     "release": "npx standard-version",
     "tag": "git push --follow-tags",
     "to_publish": "npm publish",
-    "prepublish": "npm run clean && npm run build",
+    "prepublishOnly": "npm run clean && npm run build",
     "---MISC---": "",
     "link": "npm link",
     "lint": "eslint ./src/**",
@@ -27,12 +25,14 @@
     "type": "git",
     "url": "git+https://github.com/totvs/tds-languageclient.git"
   },
+  "author": "TOTVS S.A.",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/totvs/tds-languageclient/issues"
   },
   "homepage": "https://github.com/totvs/tds-languageclient#readme",
   "dependencies": {
-    "@totvs/tds-ls": "^1.1.42",
+    "@totvs/tds-ls": "^1.1.43",
     "vscode-jsonrpc": "^5.0.1"
   },
   "devDependencies": {
@@ -41,7 +41,7 @@
     "@typescript-eslint/parser": "^3.10.1",
     "eslint": "^7.10.0",
     "rimraf": "^3.0.2",
-    "typescript": "^3.9.7"
+    "typescript": "^4.3.2"
   },
   "eslintIgnore": [
     "target/**"
