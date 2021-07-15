@@ -15,6 +15,10 @@ export default class TdsMonitorServer extends TdsServer {
 
         this.lastGetUsers = timeInMs;
         
+        return this.sendGetUsersMessage(timeInMs);
+    }
+
+    private sendGetUsersMessage(timeInMs: number): Promise<MonitorUser[]> {
         return this.connection
             .sendRequest('$totvsmonitor/getUsers', {
                 getUsersInfo: {
@@ -22,7 +26,9 @@ export default class TdsMonitorServer extends TdsServer {
                 }
             })
             .then((response: GetUsersResponse) => {
-                console.log("...getUsers: "+(Date.now()-timeInMs)+" ms");
+                //console.log("...getUsers ("+getUsersRetry+"): "+(Date.now()-timeInMs)+" ms");
+                //console.log("...getUsers: "+(Date.now()-timeInMs)+" ms");
+
                 this.usersList = response.mntUsers
                 
                 return this.usersList;
