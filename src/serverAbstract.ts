@@ -15,7 +15,7 @@ limitations under the License.
 */
 import { ResponseError } from 'vscode-jsonrpc';
 import { BuildVersion } from '.';
-import { tdsLanguageClient } from './languageClient';
+import { getTDSLanguageServer } from './languageClient';
 import {
   IAuthenticationResult,
   IConnectionResult,
@@ -158,7 +158,7 @@ export class LSServerAbstract implements TLSServerAbstract {
     this._environment = value;
   }
   public get connection(): ITdsLanguageClient {
-    return tdsLanguageClient;
+    return getTDSLanguageServer();
   }
   public get needAuthentication(): boolean {
     return this._needAuthentication;

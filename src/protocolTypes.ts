@@ -171,6 +171,8 @@ export interface ITdsLanguageClient {
 
   inspectorObjects(server: ILSServerAttributes, includeTres: boolean): any;
 
+  inspectorFunctions(server: ILSServerAttributes): any;
+
   patchGenerate(
     server: ILSServerAttributes,
     patchMaster: string,
@@ -433,6 +435,11 @@ export interface IInspectorObjectsInfo {
   includeTres: boolean;
 }
 
+export interface IInspectorFunctionsInfo {
+  connectionToken: string;
+  environment: string;
+}
+
 export interface IInspectorObject {
   name: string;
   type: string;
@@ -442,6 +449,16 @@ export interface IInspectorObject {
 export interface IInspectorObjectsResult {
   message: string;
   objects: Array<IInspectorObject>;
+}
+
+// class InspectorFunctionResult {
+//   message: string;
+//   functions: Array<string>;
+// }
+
+export interface IInspectorFunctionsResult {
+  message: string;
+  functions: Array<string>; //@acandido revisar retorno
 }
 
 export interface IPatchGenerateInfo {

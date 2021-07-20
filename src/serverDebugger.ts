@@ -22,6 +22,7 @@ import {
   IDefragRpoResult,
   IDeleteProgramResult,
   IInspectorObjectsResult,
+  IInspectorFunctionsResult,
   IPatchGenerateResult,
   IPatchResult,
   IPatchValidateResult,
@@ -178,6 +179,19 @@ export class LSServerDebugger
   inspectorObjects(includeTres: boolean): any {
     return this.connection.inspectorObjects(this, includeTres).then(
       (result: IInspectorObjectsResult) => {
+        return result;
+      },
+      (error: ResponseError<IResponseStatus>) => {
+        this.lastError = error as unknown as IResponseStatus;
+
+        return Promise.reject(error);
+      }
+    );
+  }
+
+  inspectorFunctions(): any {
+    return this.connection.inspectorFunctions(this).then(
+      (result: IInspectorFunctionsResult) => {
         return result;
       },
       (error: ResponseError<IResponseStatus>) => {

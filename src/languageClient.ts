@@ -18,8 +18,8 @@ import { EventEmitter } from 'events';
 import {
   ICompileOptions,
   ILSServerAttributes,
-  IMessageConnection,
   IStartLSOptions,
+  ITdsMessageConnection,
   LSServerType,
 } from './types';
 import {
@@ -76,6 +76,8 @@ import {
   IGetUsersInfo,
   IDefragRpoInfo,
   IDefragRpoResult,
+  IInspectorFunctionsResult,
+  IInspectorFunctionsInfo,
 } from './protocolTypes';
 
 import { ChildProcess, spawn } from 'child_process';
@@ -86,7 +88,7 @@ import { getLogger, ILogger, LogLevel } from './logger';
 
 const logger: ILogger = getLogger();
 let childProcess: ChildProcess = null;
-export let tdsLanguageClient: TdsLanguageClient;
+let tdsLanguageClient: TdsLanguageClient;
 
 export function getTDSLanguageServer(
   startOptions?: Partial<IStartLSOptions>
@@ -134,7 +136,7 @@ function launchLanguageServer(
   logging: boolean,
   args?: string[],
   options?: any
-): IMessageConnection {
+): ITdsMessageConnection {
   const spawnArgs = ['--language-server'],
     spawnOptions = {
       env: process.env,
@@ -190,11 +192,11 @@ function launchLanguageServer(
 
   connection.listen();
 
-  return connection as IMessageConnection;
+  return connection as ITdsMessageConnection;
 }
 
 class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
-  private connection: IMessageConnection = null;
+  private connection: ITdsMessageConnection = null;
 
   constructor(options?: IStartLSOptions) {
     super();
@@ -215,13 +217,13 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
       this.emit(e.method, e.params);
     });
 
-    this.connection.onUnhandledProgress((params) => {
+    this.connection.onUnhandledProgress((params: any) => {
       logger.debug('unhandledProgress: %s', params);
 
       this.emit('progress', params);
     });
 
-    this.connection.onNotification('window/logMessage', (params) => {
+    this.connection.onNotification('window/logMessage', (params: any) => {
       logger.debug('window/logMessage: %s', params);
 
       switch (params.type) {
@@ -667,6 +669,28 @@ class TdsLanguageClient extends EventEmitter implements ITdsLanguageClient {
       );
   }
 
+  inspectorFunctions(server: ILSServerAttributes) {
+    const requestData: IInspectorFunctionsInfo = {
+      connectionToken: server.token,
+      environment: server.environment
+    };
+
+    return this.connection
+      .sendRequest('$totvsserver/inspectorFunctions', {
+        inspectorFunctionsInfo: requestData,
+      })
+      .then(
+        (response: IInspectorFunctionsResult) => {
+          return response;
+        },
+        (err: rpc.ResponseError<IResponseStatus>) => {
+          logger.error(err);
+
+          return Promise.reject(err);
+        }
+      );
+  }
+    
   inspectorObjects(server: ILSServerAttributes, includeTres: boolean): any {
     const requestData: IInspectorObjectsInfo = {
       connectionToken: server.token,

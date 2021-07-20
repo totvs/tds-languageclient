@@ -36,6 +36,7 @@ import {
   ICompileExtraOptions,
   ICompileResult,
   IDeleteProgramResult,
+  IInspectorFunctionsResult,
   IInspectorObjectsResult,
   IKillUserResult,
   IPatchGenerateResult,
@@ -57,7 +58,7 @@ export interface IStartLSOptions {
   verbose: LogLevel;
 }
 
-export interface IMessageConnection extends MessageConnection {
+export interface ITdsMessageConnection extends MessageConnection {
   sendRequest<R, E>(
     type: RequestType0<R, E>,
     token?: CancellationToken
@@ -337,6 +338,8 @@ export interface ILSServerDebugger {
   ): Promise<IPatchValidateResult>;
 
   inspectorObjects(includeTres: boolean): Promise<IInspectorObjectsResult>;
+  
+  inspectorFunctions(): Promise<IInspectorFunctionsResult>;
 
   patchGenerate(
     patchMaster: string,

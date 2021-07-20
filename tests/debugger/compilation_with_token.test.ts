@@ -40,7 +40,6 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
-
   async () => doDisconnect(server);
 });
 
