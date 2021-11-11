@@ -2,7 +2,7 @@
   "name": "@totvs/tds-languageclient",
   "description": "TOTVS Language Client e Language Server Protocol",
   "displayName": "TOTVS Language Client",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "TOTVS",
   "author": {
     "name": "TOTVS",
@@ -65,7 +65,7 @@
     "link:": ""
   },
   "dependencies": {
-    "@totvs/tds-ls": "^1.1.47",
+    "@totvs/tds-ls": "^1.2.11",
     "vscode-jsonrpc": "^5.0.1",
     "winston": "^3.3.3"
   },
