@@ -24,12 +24,9 @@ export default class TdsLanguageClient extends EventEmitter {
         this._connection = createTdsMessageConnection(logging || true);
         this.servers = new Map();
 
-        //this.connection.onUnhandledNotification(e: NotificationMessage) =>  console.log(e));
-
-        this.connection.onUnhandledNotification((e: NotificationMessage) => {
-            this.emit(e.method, e.params);
-            //console.log(...arguments);
-        });
+         this._connection.onUnhandledNotification((e: NotificationMessage) => {
+             this.emit(e.method, e.params);
+         });
 
         //this.connection.onNotification('', (...params) => this.emit('event', ...params))
     }

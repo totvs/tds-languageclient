@@ -15,7 +15,7 @@ export function createTdsMessageConnection(
   args?: string[],
   options?: any
 ): TdsMessageConnection {
-  if (!instanceConnection) {
+  if (instanceConnection != null) {
     return instanceConnection;
   }
 
@@ -51,7 +51,6 @@ export function createTdsMessageConnection(
   }
 
   const childProcess = spawn(bin, spawnArgs, spawnOptions);
-
   // Use stdin and stdout for communication:
   const connection = createMessageConnection(
     new StreamMessageReader(childProcess.stdout),
