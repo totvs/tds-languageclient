@@ -8,11 +8,17 @@ import languageServerBin from "@totvs/tds-ls";
 import { chmodSync } from "fs";
 import { TdsMessageConnection } from "./types";
 
-export default function createTdsMessageConnection(
+let instanceConnection: TdsMessageConnection = null;
+
+export function createTdsMessageConnection(
   logging: boolean,
   args?: string[],
   options?: any
 ): TdsMessageConnection {
+  if (!instanceConnection) {
+    return instanceConnection;
+  }
+
   const spawnArgs = ["--language-server"],
     spawnOptions = {
       env: process.env,
@@ -54,5 +60,6 @@ export default function createTdsMessageConnection(
 
   connection.listen();
 
-  return connection as TdsMessageConnection;
+  instanceConnection = connection as TdsMessageConnection;
+  return instanceConnection;
 }

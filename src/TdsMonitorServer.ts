@@ -15,10 +15,10 @@ export default class TdsMonitorServer extends TdsServer {
 
         this.lastGetUsers = timeInMs;
         
-        return this.sendGetUsersMessage(timeInMs);
+        return this.sendGetUsersMessage();
     }
 
-    private sendGetUsersMessage(timeInMs: number): Promise<MonitorUser[]> {
+    private sendGetUsersMessage(): Promise<MonitorUser[]> {
         return this.connection
             .sendRequest('$totvsmonitor/getUsers', {
                 getUsersInfo: {

@@ -1,6 +1,6 @@
-import createTdsMessageConnection from "./createTdsMessageConnection";
 import { BuildVersion, TdsMessageConnection } from "./types";
 import { MonitorUser } from "./TdsMonitorServer";
+import { TdsLanguageClient } from ".";
 
 enum LS_SERVER_TYPE {
     PROTHEUS = 1,
@@ -10,32 +10,27 @@ enum LS_SERVER_TYPE {
 
 export default class TdsServer {
 
-    public isConnected: boolean = false;
+    public isConnected = false;
     public id: string = null;
     public token: string = null;
     public serverType: LS_SERVER_TYPE = null; // 1:Protheus, 2:Logix, 3:TotvstecX
     public address: string = null;
-    public port: number = -1;
+    public port = -1;
     public build: BuildVersion = null;
     public secure = true;
     public environment: string = null;
-    public lastGetUsers: number = 0;
+    public lastGetUsers = 0;
     public usersList: MonitorUser[] = [];
 
     protected connection: TdsMessageConnection = null;
 
-    public constructor(connection?: TdsMessageConnection) {
-        if (connection) {
-            this.connection = connection;
-        }
-        else {
-            this.connection = createTdsMessageConnection(false);
-        }
+    public constructor() {
+        this.connection = TdsLanguageClient.instance().connection;
     }
 
-    public async connect(identification: string, serverType: number, server: string, port: number, secure: boolean, buildVersion: BuildVersion, environment: string): Promise<boolean> {
+    public async connect(identification: string, serverType: number, connType: number, server: string, port: number, secure: boolean, buildVersion: BuildVersion, environment: string): Promise<boolean> {
         const connectionInfo: ConnectOptions = {
-            connType: 13,
+            connType: connType,
             serverName: identification,
             identification: identification,
             serverType: serverType,
@@ -46,7 +41,6 @@ export default class TdsServer {
             autoReconnect: true,
             environment: environment
         };
-
         return this.connection
             .sendRequest('$totvsserver/connect', {
                 connectionInfo: connectionInfo
@@ -109,7 +103,7 @@ export default class TdsServer {
 
     public async reconnect(options?: Partial<ReconnectOptions>): Promise<boolean> {
         const reconnectInfo: ReconnectOptions = Object.assign({
-            connType: 13,
+            connType: 3,
             connectionToken: this.token,
             serverName: this.id
         }, options || {});
@@ -139,7 +133,7 @@ export default class TdsServer {
             const validationInfo: ValidationOptions = {
                 server: this.address,
                 port: this.port,
-                connType: 13
+                connType: 3
             };
 
             return this.connection

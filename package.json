@@ -1,6 +1,6 @@
 {
   "name": "@totvs/tds-languageclient",
-  "version": "0.0.40",
+  "version": "0.0.41",
   "description": "TOTVS Language Client",
   "main": "./target/index.js",
   "types": "./target/index.d.ts",
@@ -32,13 +32,13 @@
   },
   "homepage": "https://github.com/totvs/tds-languageclient#readme",
   "dependencies": {
-    "@totvs/tds-ls": "1.2.13",
+    "@totvs/tds-ls": "1.2.14",
     "vscode-jsonrpc": "^5.0.1"
   },
   "devDependencies": {
     "@types/node": "^16.11.7",
-    "@typescript-eslint/eslint-plugin": "^5.3.1",
-    "@typescript-eslint/parser": "^5.3.1",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
     "eslint": "^8.2.0",
     "rimraf": "^3.0.2",
     "typescript": "^4.4.4"
