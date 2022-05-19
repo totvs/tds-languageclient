@@ -1,5 +1,5 @@
 import { BuildVersion, TdsMessageConnection } from "./types";
-import { MonitorUser } from "./TdsMonitorServer";
+import { EnvEncode, MonitorUser } from "./TdsMonitorServer";
 import { TdsLanguageClient } from ".";
 
 enum LS_SERVER_TYPE {
@@ -21,6 +21,7 @@ export default class TdsServer {
     public environment: string = null;
     public lastGetUsers = 0;
     public usersList: MonitorUser[] = [];
+    public environmentEncoding: EnvEncode[];
 
     protected connection: TdsMessageConnection = null;
 

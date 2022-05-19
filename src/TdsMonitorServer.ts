@@ -105,6 +105,17 @@ export default class TdsMonitorServer extends TdsServer {
             })
             .then((response: SetConnectionStatusResponse) => response.message);
     }
+
+    public async setEnvEncodes(envEncodes: Array<EnvEncode>): Promise<string> {
+        return this.connection
+            .sendRequest('$totvsmonitor/setEnvEncodes', {
+                setEnvEncodesInfo: {
+                    connectionToken: this.token,
+                    envEncodes: envEncodes,
+                }
+            })
+            .then((response: SetEnvEncodesResponse) => response.message);
+    }
 }
 
 export interface MonitorUser {
@@ -151,3 +162,11 @@ export interface GetConnectionStatusResponse {
     status: boolean;
 }
 
+export interface EnvEncode {
+    environment: string;
+    encoding: number;
+}
+
+export interface SetEnvEncodesResponse {
+    message: string;
+}
