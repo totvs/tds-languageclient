@@ -104,7 +104,7 @@ export default class TdsServer {
 
     public async reconnect(options?: Partial<ReconnectOptions>): Promise<boolean> {
         const reconnectInfo: ReconnectOptions = Object.assign({
-            connType: 3,
+            connType: 13,
             connectionToken: this.token,
             serverName: this.id
         }, options || {});
@@ -134,7 +134,7 @@ export default class TdsServer {
             const validationInfo: ValidationOptions = {
                 server: this.address,
                 port: this.port,
-                connType: 3
+                connType: 13
             };
 
             return this.connection
