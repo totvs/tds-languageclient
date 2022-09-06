@@ -19,7 +19,7 @@ export function createTdsMessageConnection(
     return instanceConnection;
   }
 
-  const spawnArgs = ["--language-server"],
+  const spawnArgs = ["language-server"],
     spawnOptions = {
       env: process.env,
     };
