@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/totvs/tds-languageclient#readme",
   "dependencies": {
-    "@totvs/tds-ls": "1.2.48",
+    "@totvs/tds-ls": "1.2.50",
     "vscode-jsonrpc": "^5.0.1"
   },
   "devDependencies": {
