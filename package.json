@@ -1,6 +1,6 @@
 {
   "name": "@totvs/tds-languageclient",
-  "version": "0.0.48",
+  "version": "0.0.49",
   "description": "TOTVS Language Client",
   "main": "./target/index.js",
   "types": "./target/index.d.ts",
