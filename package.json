@@ -1,6 +1,6 @@
 {
   "name": "@totvs/tds-languageclient",
-  "version": "0.0.49",
+  "version": "0.0.50",
   "description": "TOTVS Language Client",
   "main": "./target/index.js",
   "types": "./target/index.d.ts",
@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/totvs/tds-languageclient#readme",
   "dependencies": {
-    "@totvs/tds-ls": "1.2.50",
+    "@totvs/tds-ls": "1.2.62",
     "vscode-jsonrpc": "^5.0.1"
   },
   "devDependencies": {
