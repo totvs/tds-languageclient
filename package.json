@@ -1,6 +1,6 @@
 {
   "name": "@totvs/tds-languageclient",
-  "version": "0.0.37",
+  "version": "0.0.38",
   "description": "TOTVS Language Client",
   "main": "./target/index.js",
   "types": "./target/index.d.ts",
@@ -19,7 +19,8 @@
     "---MISC---": "",
     "link": "npm link",
     "lint": "eslint ./src/**",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "updProcess": "npm run release & npm run tag & npm run to_publish"
   },
   "repository": {
     "type": "git",

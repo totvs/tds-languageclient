@@ -16,6 +16,7 @@ export default class TdsServer {
     public serverType: LS_SERVER_TYPE = null; // 1:Protheus, 2:Logix, 3:TotvstecX
     public address: string = null;
     public port: number = -1;
+    public serverTypeAsString: string = null;
     public build: BuildVersion = null;
     public secure = true;
     public environment: string = null;
@@ -135,10 +136,15 @@ export default class TdsServer {
         if ((this.address === null) || (this.port === -1))
             return false;
 
+        if(!this.serverTypeAsString || this.serverTypeAsString.trim.length === 0) {
+            this.serverTypeAsString = this.getServerTypeString();
+        }
+
         const tryValidate = ((): Promise<boolean> => {
             const validationInfo: ValidationOptions = {
                 server: this.address,
                 port: this.port,
+                serverType: this.serverTypeAsString,
                 connType: 13
             };
 
@@ -176,6 +182,19 @@ export default class TdsServer {
             })
             .then((response: any) => response.message);
     }
+
+    private getServerTypeString(): string {
+        switch(this.serverType){
+            case LS_SERVER_TYPE.LOGIX:
+                return "totvs_server_logix";
+            case LS_SERVER_TYPE.PROTHEUS:
+                return "totvs_server_protheus";
+            case LS_SERVER_TYPE.TOVSTECX:
+                return "totvs_server_totvstec";
+            default:
+                return "";
+        }
+    }
 }
 
 declare type ServerEncoding = 'CP1252' | 'CP1251';
@@ -183,6 +202,7 @@ declare type ServerEncoding = 'CP1252' | 'CP1251';
 interface ValidationOptions {
     server: string;
     port: number;
+    serverType: string;
     connType: number;
 }
 
