@@ -1,6 +1,6 @@
 import { MessageConnection, RequestType0, CancellationToken, RequestType, RequestType1, RequestType2, RequestType3, RequestType4, RequestType5, RequestType6, RequestType7, RequestType8, RequestType9 } from "vscode-jsonrpc";
 
-export type BuildVersion = '7.00.131227A' | '7.00.170117A' | '7.00.191205P';
+export type BuildVersion = '7.00.131227A' | '7.00.170117A' | '7.00.191205P' | '7.00.210324P';
 
 export interface TdsMessageConnection extends MessageConnection {
     sendRequest<R, E, RO>(type: RequestType0<R, E, RO>, token?: CancellationToken): Promise<R>;

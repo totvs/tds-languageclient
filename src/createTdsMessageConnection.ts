@@ -8,12 +8,18 @@ import languageServerBin from "@totvs/tds-ls";
 import { chmodSync } from "fs";
 import { TdsMessageConnection } from "./types";
 
-export default function createTdsMessageConnection(
+let instanceConnection: TdsMessageConnection = null;
+
+export function createTdsMessageConnection(
   logging: boolean,
   args?: string[],
   options?: any
 ): TdsMessageConnection {
-  const spawnArgs = ["--language-server"],
+  if (instanceConnection != null) {
+    return instanceConnection;
+  }
+
+  const spawnArgs = ["language-server"],
     spawnOptions = {
       env: process.env,
     };
@@ -45,7 +51,6 @@ export default function createTdsMessageConnection(
   }
 
   const childProcess = spawn(bin, spawnArgs, spawnOptions);
-
   // Use stdin and stdout for communication:
   const connection = createMessageConnection(
     new StreamMessageReader(childProcess.stdout),
@@ -54,5 +59,6 @@ export default function createTdsMessageConnection(
 
   connection.listen();
 
-  return connection as TdsMessageConnection;
+  instanceConnection = connection as TdsMessageConnection;
+  return instanceConnection;
 }

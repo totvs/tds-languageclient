@@ -1,4 +1,4 @@
-import createTdsMessageConnection from './createTdsMessageConnection';
+import { createTdsMessageConnection} from './createTdsMessageConnection';
 import { NotificationMessage } from 'vscode-jsonrpc';
 import TdsServer from './TdsServer';
 import TdsMonitorServer from './TdsMonitorServer';
@@ -9,22 +9,24 @@ let instance: TdsLanguageClient = null;
 
 export default class TdsLanguageClient extends EventEmitter {
 
-    private connection: TdsMessageConnection = null;
+    private _connection: TdsMessageConnection = null;
+    
+    public get connection(): TdsMessageConnection {
+        return this._connection;
+    }
+    
     private servers: Map<string, TdsServer> = null;
 
     private constructor(options?: any) {
         super();
 
-        const logging = (options && options.logging) ? options.logging : false;
-        this.connection = createTdsMessageConnection(logging);
+        const logging = (options && options.logging) ? options.logging : true;
+        this._connection = createTdsMessageConnection(logging || true);
         this.servers = new Map();
 
-        //this.connection.onUnhandledNotification(e: NotificationMessage) =>  console.log(e));
-
-        this.connection.onUnhandledNotification((e: NotificationMessage) => {
-            this.emit(e.method, e.params);
-            //console.log(...arguments);
-        });
+         this._connection.onUnhandledNotification((e: NotificationMessage) => {
+             this.emit(e.method, e.params);
+         });
 
         //this.connection.onNotification('', (...params) => this.emit('event', ...params))
     }
@@ -48,14 +50,14 @@ export default class TdsLanguageClient extends EventEmitter {
     }
 
     public createMonitorServer(): TdsMonitorServer {
-        return new TdsMonitorServer(this.connection);
+        return new TdsMonitorServer();
     }
 
     public async getMonitorServer(token: string): Promise<TdsMonitorServer>;
     //public async getMonitorServer(options: AuthenticationOptions): Promise<TdsMonitorServer>;
     public async getMonitorServer(arg: any): Promise<TdsMonitorServer> {
         return this.getServer(TdsMonitorServer, arg);
-    };
+    }
 
     //public async getServer<T extends TdsServer>(token: string): Promise<T>;
     //public async getServer<T extends TdsServer>(options: AuthenticationOptions): Promise<T>
